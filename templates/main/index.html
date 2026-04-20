@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Kickx - Modern Sneaker Marketplace{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="display-4 fw-bold mb-4">Find Your Perfect Pair</h1>
+            <p class="lead mb-4">Discover the latest sneakers from top brands around the world</p>
+            <a href="{{ url_for('product_catalog') }}" class="btn btn-primary btn-lg">Shop Now</a>
+        </div>
+        <div class="hero-images">
+            <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1587&q=80" alt="Nike Air Jordan">
+            <img src="https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1025&q=80" alt="Adidas Sneakers">
+            <img src="https://images.unsplash.com/photo-1605348532760-6753d2c43329?ixlib=rb-4.0.3&auto=format&fit=crop&w=1587&q=80" alt="New Balance">
+            <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1587&q=80" alt="Puma Sneakers">
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="featured-products mb-5">
+    <h2 class="section-title text-center mb-4">Featured Products</h2>
+    <div class="row">
+        {% for product in featured_products %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 product-card">
+                <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-primary fw-bold">₱{{ product.price }}</p>
+                    <div class="d-grid">
+                        <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- New Arrivals Section -->
+<section class="new-arrivals mb-5">
+    <h2 class="section-title text-center mb-4">New Arrivals</h2>
+    <div class="row">
+        {% for product in new_arrivals %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 product-card">
+                <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-primary fw-bold">₱{{ product.price }}</p>
+                    <div class="d-grid">
+                        <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Trending Section -->
+<section class="trending mb-5">
+    <h2 class="section-title text-center mb-4">Trending Now</h2>
+    <div class="row">
+        {% for product in trending %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100 product-card">
+                <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-primary fw-bold">₱{{ product.price }}</p>
+                    <div class="d-grid">
+                        <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories mb-5">
+    <h2 class="section-title text-center mb-4">Shop by Category</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/categories/running.jpg') }}" class="card-img-top" alt="Running">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Running</h5>
+                    <a href="{{ url_for('category_products', slug='running') }}" class="btn btn-outline-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/categories/basketball.jpg') }}" class="card-img-top" alt="Basketball">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Basketball</h5>
+                    <a href="{{ url_for('category_products', slug='basketball') }}" class="btn btn-outline-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 category-card">
+                <img src="{{ url_for('static', filename='images/categories/lifestyle.jpg') }}" class="card-img-top" alt="Lifestyle">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Lifestyle</h5>
+                    <a href="{{ url_for('category_products', slug='lifestyle') }}" class="btn btn-outline-primary">Shop Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-truck fa-3x mb-3 text-primary"></i>
+                    <h4>Free Shipping</h4>
+                    <p>On orders over $100</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-undo fa-3x mb-3 text-primary"></i>
+                    <h4>Easy Returns</h4>
+                    <p>30-day return policy</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-lock fa-3x mb-3 text-primary"></i>
+                    <h4>Secure Payment</h4>
+                    <p>100% secure checkout</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="py-5 bg-dark text-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h3 class="mb-4">Subscribe to Our Newsletter</h3>
+                <p class="mb-4">Get the latest updates on new products and upcoming sales</p>
+                <form class="newsletter-form">
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Enter your email" required>
+                        <button class="btn btn-primary" type="submit">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1552346154-21d32810aba3?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 100px 0;
+        margin-bottom: 30px;
+        position: relative;
+        height: 500px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .hero-content {
+        z-index: 1;
+        position: relative;
+    }
+    
+    .hero-images {
+        position: absolute;
+        bottom: -50px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+    
+    .hero-images img {
+        width: 140px;
+        height: 140px;
+        object-fit: contain;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        padding: 10px;
+        transform: rotate(-5deg);
+        transition: all 0.3s ease;
+    }
+    
+    .hero-images img:nth-child(even) {
+        transform: rotate(5deg);
+    }
+    
+    .hero-images img:hover {
+        transform: translateY(-10px) rotate(0);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .hero-images img {
+            width: 100px;
+            height: 100px;
+        }
+        
+        .hero-images {
+            gap: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Newsletter form submission
+    document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = this.querySelector('input[type="email"]').value;
+        // TODO: Handle newsletter subscription
+        alert('Thank you for subscribing to our newsletter!');
+        this.reset();
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Back in Stock - Kickx</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #0d6efd;
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        .content {
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .product {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #eeeeee;
+            border-radius: 5px;
+        }
+        .product img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        .product-details {
+            padding: 15px;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #0d6efd;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius:.25rem;
+            margin-top: 15px;
+        }
+        .footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #777777;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Good News!</h1>
+            <p>A product from your wishlist is back in stock</p>
+        </div>
+        
+        <div class="content">
+            <p>Hello {{ user.first_name or user.username }},</p>
+            
+            <p>Great news! A product you've been waiting for is back in stock at Kickx.</p>
+            
+            <div class="product">
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" style="max-width: 200px;">
+                {% endif %}
+                
+                <div class="product-details">
+                    <h3>{{ product.name }}</h3>
+                    <p><strong>Brand:</strong> {{ product.brand.name if product.brand else 'Various' }}</p>
+                    <p><strong>Price:</strong> ${{ product.price }}</p>
+                    <p><strong>Category:</strong> {{ product.category.name if product.category else 'Uncategorized' }}</p>
+                    
+                    <a href="http://{{ request.host }}/products/{{ product.id }}" class="cta-button">View Product</a>
+                </div>
+            </div>
+            
+            <p>Don't wait too long – popular items sell out quickly!</p>
+            
+            <p>If you have any questions, feel free to reply to this email or contact our customer support.</p>
+            
+            <p>Happy shopping!</p>
+            <p>The Kickx Team</p>
+        </div>
+        
+        <div class="footer">
+            <p>© {{ now.year }} Kickx. All rights reserved.</p>
+            <p>You received this email because you added this product to your wishlist.</p>
+            <p>
+                <a href="http://{{ request.host }}/profile/notifications">Manage Notifications</a> | 
+                <a href="http://{{ request.host }}/unsubscribe">Unsubscribe</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,369 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}{% if user %}Edit{% else %}Create{% endif %} User - Kickx Admin{% endblock %}
+
+{% block content %}
+<div class="admin-content container-fluid mx-auto" style="max-width: 800px;">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            {% if user %}
+                {% if user.is_admin %}
+                Edit Administrator
+                {% else %}
+                Edit Customer
+                {% endif %}
+            {% else %}
+                Add New User
+            {% endif %}
+        </h2>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Users
+            </a>
+        </div>
+    </div>
+
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <div class="d-flex align-items-center">
+                <div class="card-icon {% if user and user.is_admin %}admin-icon{% else %}users-icon{% endif %} me-3">
+                    <i class="fas fa-{% if user %}user-edit{% else %}user-plus{% endif %}"></i>
+                </div>
+                <h5 class="card-title mb-0">
+                    {% if user %}
+                        Edit User: {{ user.first_name }} {{ user.last_name }}
+                    {% else %}
+                        User Information
+                    {% endif %}
+                </h5>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" class="user-form">
+                <!-- User Type Selector -->
+                {% if not user %}
+                <div class="user-type-selector mb-4">
+                    <label class="form-label d-block mb-3">User Type</label>
+                    <div class="row gx-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <input type="radio" class="btn-check" name="user_type" id="customer_type" value="customer" checked>
+                            <label class="btn btn-outline-primary w-100 user-type-btn py-3" for="customer_type">
+                                <i class="fas fa-user mb-2 fa-2x"></i>
+                                <div>Customer</div>
+                                <small class="d-block text-muted">Regular user account</small>
+                            </label>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="radio" class="btn-check" name="user_type" id="admin_type" value="admin">
+                            <label class="btn btn-outline-primary w-100 user-type-btn py-3" for="admin_type">
+                                <i class="fas fa-user-shield mb-2 fa-2x"></i>
+                                <div>Administrator</div>
+                                <small class="d-block text-muted">Full access to admin area</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name if user else '' }}" placeholder="Enter first name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name if user else '' }}" placeholder="Enter last name" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ user.username if user else '' }}" placeholder="Enter username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email if user else '' }}" placeholder="Enter email address" required {% if user %}disabled{% endif %}>
+                            {% if user %}
+                            <div class="form-text small">Email addresses cannot be changed after user creation</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">{% if user %}New Password{% else %}Password{% endif %}</label>
+                            <input type="password" class="form-control" id="new_password" name="new_password" placeholder="{% if user %}Enter new password{% else %}Enter password{% endif %}" {% if not user %}required{% endif %}>
+                            {% if user %}
+                            <div class="form-text small">Leave blank to keep the current password</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if not user %}
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="row mb-4">
+                    {% if user and user.is_admin or not user %}
+                    <div class="col-md-6">
+                        <div class="account-type-section mb-3 p-3 rounded {% if user and user.is_admin %}bg-admin-light{% else %}bg-light{% endif %}">
+                            <label class="fw-bold mb-2">Account Type</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_admin" name="is_admin" value="1" {% if user and user.is_admin %}checked{% endif %}>
+                                <label class="form-check-label" for="is_admin">
+                                    Administrator Account
+                                </label>
+                                <div class="form-text small mt-1">
+                                    <i class="fas fa-info-circle me-1 text-primary"></i> 
+                                    Admins have full control over the site
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <input type="hidden" name="is_admin" value="0">
+                    {% endif %}
+                    
+                    <div class="col-md-6">
+                        <div class="account-status-section mb-3 p-3 rounded {% if not user or user.is_active %}bg-success-light{% else %}bg-danger-light{% endif %}">
+                            <label class="fw-bold mb-2">Account Status</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {% if not user or user.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">
+                                    Active Account
+                                </label>
+                                <div class="form-text small mt-1">
+                                    <i class="fas fa-info-circle me-1 text-primary"></i>
+                                    Inactive accounts cannot log in
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end">
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary me-2">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> {% if user %}Update{% else %}Create{% endif %} User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Card styles */
+.dashboard-card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.users-icon {
+    background-color: #6f42c1;
+}
+
+.admin-icon {
+    background-color: #0d6efd;
+}
+
+/* User type selector */
+.user-type-btn {
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.user-type-btn:hover {
+    transform: translateY(-3px);
+}
+
+/* Background colors for account sections */
+.bg-admin-light {
+    background-color: rgba(13, 110, 253, 0.1);
+    border: 1px solid rgba(13, 110, 253, 0.2);
+}
+
+.bg-success-light {
+    background-color: rgba(25, 135, 84, 0.1);
+    border: 1px solid rgba(25, 135, 84, 0.2);
+}
+
+.bg-danger-light {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+/* Form styles */
+.form-label {
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    border-radius: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+.form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    margin-top: 0.15em;
+}
+
+/* Switch styles */
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.5em;
+}
+
+/* Button styles */
+.btn {
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    box-shadow: 0 2px 5px rgba(var(--primary-rgb), 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn-outline-primary:hover, 
+.btn-outline-success:hover,
+.btn-outline-secondary:hover,
+.btn-outline-danger:hover {
+    transform: translateY(-2px);
+}
+
+/* Account type section */
+.account-type-section, .account-status-section {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // For new users, toggle the is_admin checkbox based on user type selection
+    const customerTypeBtn = document.getElementById('customer_type');
+    const adminTypeBtn = document.getElementById('admin_type');
+    const isAdminCheckbox = document.getElementById('is_admin');
+    
+    if (customerTypeBtn && adminTypeBtn && isAdminCheckbox) {
+        customerTypeBtn.addEventListener('change', function() {
+            if (this.checked) {
+                isAdminCheckbox.checked = false;
+            }
+        });
+        
+        adminTypeBtn.addEventListener('change', function() {
+            if (this.checked) {
+                isAdminCheckbox.checked = true;
+            }
+        });
+    }
+    
+    // Toggle background colors based on status
+    const isAdminStatusCheckbox = document.getElementById('is_admin');
+    const adminStatusSection = document.querySelector('.account-type-section');
+    
+    if (isAdminStatusCheckbox && adminStatusSection) {
+        isAdminStatusCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                adminStatusSection.classList.remove('bg-light');
+                adminStatusSection.classList.add('bg-admin-light');
+            } else {
+                adminStatusSection.classList.remove('bg-admin-light');
+                adminStatusSection.classList.add('bg-light');
+            }
+        });
+    }
+    
+    // Toggle background colors based on active status
+    const isActiveStatusCheckbox = document.getElementById('is_active');
+    const activeStatusSection = document.querySelector('.account-status-section');
+    
+    if (isActiveStatusCheckbox && activeStatusSection) {
+        isActiveStatusCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                activeStatusSection.classList.remove('bg-danger-light');
+                activeStatusSection.classList.add('bg-success-light');
+            } else {
+                activeStatusSection.classList.remove('bg-success-light');
+                activeStatusSection.classList.add('bg-danger-light');
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

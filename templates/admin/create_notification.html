@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Notification - Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-bell me-3 header-icon" style="font-size: 1.8rem;"></i>
+            <div>
+                <h1 class="mb-1">Create Notification</h1>
+                <p class="text-muted mb-0">Send notifications to all users</p>
+            </div>
+        </div>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    <form action="{{ url_for('admin_create_notification') }}" method="POST">
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Notification Type</label>
+                            <select class="form-select" id="type" name="type" required>
+                                <option value="" selected disabled>Select notification type</option>
+                                <option value="new_arrival">New Arrival</option>
+                                <option value="sale">Sale</option>
+                                <option value="exclusive">Exclusive Drop</option>
+                                <option value="general">General</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" maxlength="255" required placeholder="Enter notification message (max 255 characters)"></textarea>
+                            <div class="form-text text-end">
+                                <span id="char-count">0</span>/255 characters
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="link" class="form-label">Link (Optional)</label>
+                            <input type="text" class="form-control" id="link" name="link" placeholder="URL to redirect users when they click the notification">
+                            <div class="form-text">If provided, users will be redirected to this URL when they click on the notification.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="related_product_id" class="form-label">Related Product (Optional)</label>
+                            <select class="form-select" id="related_product_id" name="related_product_id">
+                                <option value="">None</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}">{{ product.brand }} {{ product.model }} - {{ product.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">If this notification is about a specific product, select it here.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5 class="mb-3">Preview</h5>
+                            <div class="notification-preview p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
+                                <div class="d-flex">
+                                    <div id="preview-icon" class="notification-icon bg-primary text-white"><i class="fas fa-bell"></i></div>
+                                    <div class="ms-3 flex-grow-1">
+                                        <div class="d-flex align-items-center justify-content-between mb-1">
+                                            <h6 id="preview-type" class="mb-0 fw-bold">Notification</h6>
+                                            <small class="text-muted">Just now</small>
+                                        </div>
+                                        <p id="preview-message" class="mb-0">Your notification message will appear here</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="confirm" required>
+                            <label class="form-check-label" for="confirm">
+                                I confirm that I want to send this notification to all active users
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary py-2">
+                                <i class="fas fa-paper-plane me-2"></i> Send Notification
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Character counter for message
+        const messageField = document.getElementById('message');
+        const charCount = document.getElementById('char-count');
+        
+        messageField.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+        
+        // Live preview
+        const typeSelect = document.getElementById('type');
+        const previewType = document.getElementById('preview-type');
+        const previewIcon = document.getElementById('preview-icon');
+        const previewMessage = document.getElementById('preview-message');
+        
+        function updatePreview() {
+            // Update message
+            previewMessage.textContent = messageField.value || 'Your notification message will appear here';
+            
+            // Update type and icon
+            const selectedType = typeSelect.value;
+            if (selectedType) {
+                let iconClass, bgClass, typeName;
+                
+                switch(selectedType) {
+                    case 'new_arrival':
+                        iconClass = 'fas fa-tshirt';
+                        bgClass = 'bg-primary';
+                        typeName = 'New Arrival';
+                        break;
+                    case 'sale':
+                        iconClass = 'fas fa-tag';
+                        bgClass = 'bg-success';
+                        typeName = 'Sale';
+                        break;
+                    case 'exclusive':
+                        iconClass = 'fas fa-star';
+                        bgClass = 'bg-warning';
+                        typeName = 'Exclusive Drop';
+                        break;
+                    default:
+                        iconClass = 'fas fa-bell';
+                        bgClass = 'bg-info';
+                        typeName = 'General';
+                }
+                
+                previewIcon.className = `notification-icon ${bgClass} text-white`;
+                previewIcon.innerHTML = `<i class="${iconClass}"></i>`;
+                previewType.textContent = typeName;
+            } else {
+                previewIcon.className = 'notification-icon bg-primary text-white';
+                previewIcon.innerHTML = '<i class="fas fa-bell"></i>';
+                previewType.textContent = 'Notification';
+            }
+        }
+        
+        // Update preview when input changes
+        messageField.addEventListener('input', updatePreview);
+        typeSelect.addEventListener('change', updatePreview);
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notification-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0;
+    }
+    
+    .header-icon {
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %} 

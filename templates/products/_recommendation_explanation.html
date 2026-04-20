@@ -1,0 +1,64 @@
+<!-- Recommendation Explanation Component -->
+<div class="recommendation-explanation">
+    {% if reason == 'very_similar_product' %}
+    <span class="badge bg-primary">
+        <i class="fas fa-tags me-1"></i> Very Similar Style
+    </span>
+    <small class="text-muted d-block mt-1">This product shares many attributes with the one you're viewing</small>
+
+    {% elif reason == 'similar_product' %}
+    <span class="badge bg-info">
+        <i class="fas fa-tag me-1"></i> Similar Style
+    </span>
+    <small class="text-muted d-block mt-1">This product has similar characteristics</small>
+
+    {% elif reason == 'frequently_bought_together' %}
+    <span class="badge bg-success">
+        <i class="fas fa-shopping-bag me-1"></i> Frequently Bought Together
+    </span>
+    <small class="text-muted d-block mt-1">Many customers purchase these together</small>
+
+    {% elif reason == 'others_also_liked' %}
+    <span class="badge bg-secondary">
+        <i class="fas fa-thumbs-up me-1"></i> Others Also Liked
+    </span>
+    <small class="text-muted d-block mt-1">Customers who viewed this also enjoyed this product</small>
+
+    {% elif reason == 'recommended_for_you' %}
+    <span class="badge bg-warning text-dark">
+        <i class="fas fa-user me-1"></i> Recommended for You
+    </span>
+    <small class="text-muted d-block mt-1">Based on your browsing history and preferences</small>
+
+    {% elif reason == 'trending' %}
+    <span class="badge bg-danger">
+        <i class="fas fa-fire me-1"></i> Trending
+    </span>
+    <small class="text-muted d-block mt-1">Popular right now</small>
+
+    {% elif reason == 'same_brand_and_category' %}
+    <span class="badge bg-primary">
+        <i class="fas fa-check-double me-1"></i> Same Brand & Category
+    </span>
+    <small class="text-muted d-block mt-1">Similar product from the same brand</small>
+
+    {% elif reason == 'same_brand' %}
+    <span class="badge bg-secondary">
+        <i class="fas fa-check me-1"></i> Same Brand
+    </span>
+    <small class="text-muted d-block mt-1">Another product from this brand</small>
+
+    {% elif reason == 'same_category' %}
+    <span class="badge bg-info">
+        <i class="fas fa-layer-group me-1"></i> Same Category
+    </span>
+    <small class="text-muted d-block mt-1">Similar type of product</small>
+
+    {% else %}
+    <span class="badge bg-light text-dark">
+        <i class="fas fa-star me-1"></i> You May Also Like
+    </span>
+    <small class="text-muted d-block mt-1">Worth checking out</small>
+
+    {% endif %}
+</div> 

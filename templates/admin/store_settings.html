@@ -1,0 +1,97 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Store Settings - Kickx{% endblock %}
+
+{% block header_title %}Store Settings{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Store Settings</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Store Settings</h2>
+        <div>
+            <button class="btn btn-primary">
+                <i class="fas fa-save me-1"></i> Save Changes
+            </button>
+        </div>
+    </div>
+
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <div class="d-flex align-items-center">
+                <div class="card-icon me-3" style="background-color: #fd7e14;">
+                    <i class="fas fa-store"></i>
+                </div>
+                <h5 class="card-title mb-0">General Store Settings</h5>
+            </div>
+        </div>
+        <div class="card-body p-4 text-center">
+            <div class="empty-state">
+                <i class="fas fa-store fa-3x mb-3 text-muted"></i>
+                <h5>Store Settings</h5>
+                <p class="text-muted">This feature is coming soon. Check back later!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Card styling */
+.card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+</style>
+{% endblock %} 

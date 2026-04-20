@@ -1,0 +1,319 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Admin Users - Kickx Admin{% endblock %}
+
+{% block header_title %}Admin Users{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Admin Users</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-user-shield me-2"></i> Admin Users
+            </h5>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                <i class="fas fa-plus me-1"></i> Add New Admin
+            </button>
+        </div>
+        <div class="card-body p-0">
+            {% if admins %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Admin</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admins %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="admin-avatar me-3 bg-primary text-white">
+                                        {{ admin.first_name[0] | upper if admin.first_name else admin.username[0] | upper }}
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">
+                                            {% if admin.first_name and admin.last_name %}
+                                                {{ admin.first_name }} {{ admin.last_name }}
+                                            {% else %}
+                                                {{ admin.username }}
+                                            {% endif %}
+                                        </h6>
+                                        <small class="text-muted">{{ admin.role if admin.role else 'Admin' }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ admin.email }}</td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary">
+                                    {% if admin.is_admin %}Super Admin{% else %}Standard Admin{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-{{ 'active' if admin.is_active else 'inactive' }}">
+                                    {{ 'Active' if admin.is_active else 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>{{ admin.created_at.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="{{ url_for('admin.edit_user', id=admin.id) }}" class="btn btn-sm btn-outline-primary action-btn" title="Edit Admin" data-bs-toggle="tooltip">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('admin.view_user', id=admin.id) }}" class="btn btn-sm btn-outline-info action-btn" title="View Details" data-bs-toggle="tooltip">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-danger action-btn" 
+                                            title="Remove Admin" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteAdminModal" 
+                                            data-admin-id="{{ admin.id }}"
+                                            data-admin-username="{% if admin.first_name and admin.last_name %}{{ admin.first_name }} {{ admin.last_name }}{% else %}{{ admin.username }}{% endif %}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <div class="empty-state-icon bg-light rounded-circle mb-3">
+                        <i class="fas fa-users text-primary"></i>
+                    </div>
+                    <h5>No Admin Users Found</h5>
+                    <p class="text-muted mb-3">There are no admin users in the system yet.</p>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                        <i class="fas fa-plus me-1"></i> Add Your First Admin
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Admin Modal -->
+<div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAdminModalLabel">Add New Admin User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('admin.create_user') }}" method="POST">
+                <div class="modal-body">
+                    
+                    <div class="mb-3">
+                        <label for="adminUsername" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="adminUsername" name="username" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="adminFirstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="adminFirstName" name="first_name">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="adminLastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="adminLastName" name="last_name">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="adminEmail" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="adminEmail" name="email" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="adminPassword" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="adminPassword" name="password">
+                        <small class="form-text">Leave blank to generate a random password.</small>
+                    </div>
+                    
+                    <input type="hidden" name="is_admin" value="1">
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="isActive" name="is_active" checked>
+                            <label class="form-check-label" for="isActive">Active Account</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Admin</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Admin Modal -->
+<div class="modal fade" id="deleteAdminModal" tabindex="-1" aria-labelledby="deleteAdminModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAdminModalLabel">Confirm Admin Removal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove <span id="adminNameToDelete"></span> from admin users?</p>
+                <p class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i> This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteAdminForm" method="POST" action="{{ url_for('admin.delete_user', id=0) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i> Remove Admin
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Admin Avatar */
+    .admin-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    /* Status Badges */
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: capitalize;
+        display: inline-block;
+    }
+    
+    .status-badge.status-active {
+        background-color: rgba(25, 135, 84, 0.15);
+        color: #198754;
+    }
+    
+    .status-badge.status-inactive {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+    }
+    
+    /* Empty state */
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+    }
+    
+    /* Custom colors */
+    .bg-primary-subtle {
+        background-color: rgba(var(--bs-primary-rgb), 0.15);
+    }
+    
+    .text-primary {
+        color: var(--primary-color) !important;
+    }
+    
+    /* Action Buttons */
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn i {
+        font-size: 0.9rem;
+    }
+    
+    .btn-outline-primary:hover, .btn-outline-info:hover, .btn-outline-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Table style adjustments */
+    .table th {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    if (tooltipTriggerList.length > 0) {
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                delay: { show: 500, hide: 100 }
+            });
+        });
+    }
+    
+    // Handle delete modal
+    var deleteModal = document.getElementById('deleteAdminModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var adminId = button.getAttribute('data-admin-id');
+            var adminName = button.getAttribute('data-admin-username');
+            
+            var nameElement = document.getElementById('adminNameToDelete');
+            if (nameElement) {
+                nameElement.textContent = adminName;
+            }
+            
+            var form = document.getElementById('deleteAdminForm');
+            if (form) {
+                form.action = form.action.replace('/0', '/' + adminId);
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

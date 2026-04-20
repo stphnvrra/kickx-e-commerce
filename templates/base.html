@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Kickx - Modern Sneaker Marketplace{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.png') }}">
+    
+    <!-- CSS -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {{ bootstrap.load_css() }}
+    <style>
+        :root {
+            --primary-color: #EC5228;
+            --primary-hover: #d13e18;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+            --transition-speed: 0.3s;
+        }
+        
+        body {
+            scroll-behavior: smooth;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+            min-height: 100vh;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-hover) 100%) !important;
+            border: none !important;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 4px 10px rgba(236, 82, 40, 0.25);
+        }
+        
+        .btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+            background: linear-gradient(90deg, var(--primary-hover) 0%, var(--primary-color) 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(236, 82, 40, 0.35);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color) !important;
+            border: 1px solid var(--primary-color) !important;
+            background: transparent !important;
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-hover) 100%) !important;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(236, 82, 40, 0.25);
+        }
+        
+        a {
+            color: var(--primary-color);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        a:hover {
+            color: var(--primary-hover);
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        
+        .border-primary {
+            border-color: var(--primary-color) !important;
+        }
+        
+        /* Header specific styles */
+        .navbar {
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .navbar.scrolled {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        header .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            position: relative;
+            transition: all var(--transition-speed) ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        header .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        header .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 50%;
+            background-color: white;
+            transition: all var(--transition-speed) ease;
+            transform: translateX(-50%);
+            opacity: 0;
+        }
+        
+        header .nav-link:hover::after {
+            width: 0;
+        }
+        
+        header .navbar-nav .active > .nav-link,
+        header .navbar-nav .nav-link.active,
+        header .navbar-nav .nav-link.show,
+        header .navbar-nav .show > .nav-link {
+            color: white !important;
+            font-weight: bold;
+        }
+        
+        .navbar-brand {
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+        
+        .nav-icon {
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .nav-icon:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Special style for icon-only nav links */
+        .icon-link {
+            background-color: transparent !important;
+        }
+        
+        .icon-link:hover {
+            background-color: transparent !important;
+        }
+        
+        .icon-link::after {
+            display: none;
+        }
+        
+        .dropdown-menu {
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: none;
+        }
+        
+        /* Special style for the dropdown items */
+        .dropdown-item {
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .dropdown-item:hover, .dropdown-item:focus {
+            background-color: rgba(236, 82, 40, 0.1);
+            color: var(--primary-color);
+        }
+        
+        /* Search bar styles */
+        .search-container {
+            position: relative;
+            transition: all var(--transition-speed) ease;
+            min-width: 320px;
+        }
+        
+        .search-container:focus-within {
+            min-width: 360px;
+        }
+        
+        .search-container:focus-within input {
+            box-shadow: 0 0 10px rgba(255,255,255,0.2);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .search-container input {
+            border-radius: 6px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding-left: 15px;
+            padding-right: 40px;
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .search-container input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .search-container button {
+            color: rgba(255, 255, 255, 0.7);
+            transition: all var(--transition-speed) ease;
+            width: 40px;
+        }
+        
+        .search-container button:hover {
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .search-container:focus-within button {
+            color: var(--primary-color);
+        }
+        
+        .search-container input:focus {
+            outline: none;
+        }
+        
+        /* Footer styles */
+        .footer-links a {
+            transition: all var(--transition-speed) ease;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: white;
+            transition: all var(--transition-speed) ease;
+        }
+        
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+        
+        .social-links a {
+            transition: all var(--transition-speed) ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+        }
+        
+        .social-links a:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 50%;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Cookie consent */
+        .cookie-consent {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            padding: 15px;
+            z-index: 9999;
+            display: none;
+        }
+        
+        /* Modern card styling */
+        .card {
+            border: none;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        
+        .card-title {
+            color: #3a3a3a;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Modern form controls */
+        .form-control {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(236, 82, 40, 0.15);
+            border: none;
+        }
+        
+        /* Modern alert styling */
+        .alert {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        
+        .alert-info {
+            background-color: #e9f0fa;
+            color: #3a587f;
+        }
+        
+        .alert-success {
+            background-color: #e7f7ed;
+            color: #2a6547;
+        }
+        
+        .alert-warning {
+            background-color: #fff8e1;
+            color: #94740e;
+        }
+        
+        .alert-danger {
+            background-color: #fee7e7;
+            color: #b54142;
+        }
+        
+        /* Section spacing */
+        .section {
+            padding: 60px 0;
+        }
+        
+        .section-title {
+            margin-bottom: 30px;
+            position: relative;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+        }
+        
+        /* Notification Styles */
+        .notification-badge {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.4rem;
+        }
+        
+        .notification-dropdown {
+            padding: 0;
+        }
+        
+        .notification-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        
+        .notification-item:hover {
+            background-color: rgba(236, 82, 40, 0.05);
+        }
+        
+        .notification-item.unread {
+            background-color: rgba(236, 82, 40, 0.1);
+        }
+        
+        .notification-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-text {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+            color: var(--dark-color);
+        }
+        
+        .notification-item.unread .notification-text {
+            font-weight: 600;
+        }
+        
+        .notification-time {
+            font-size: 0.75rem;
+            color: var(--muted-text);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg navbar-dark fixed-top shadow-sm" style="background: linear-gradient(135deg, var(--primary-color), #f77c3c, #e63b0c);">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+                <span class="fw-bold fs-4">Kickx</span>
+                <span class="badge bg-light text-dark ms-2" style="font-size: 0.6rem; padding: 0.25rem 0.5rem;">PREMIUM</span>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('product_catalog') }}">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('new_arrivals') }}">New Arrivals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('featured') }}">Featured</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('trending_products') }}">Trending</a>
+                    </li>
+                </ul>
+                
+                <form class="d-flex me-3 position-relative search-container" action="{{ url_for('search') }}" method="GET">
+                    <input class="form-control" type="search" name="q" placeholder="Search for sneakers, brands, or styles...">
+                    <button class="btn position-absolute end-0 top-0 bottom-0" type="submit" style="background: transparent;">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link icon-link position-relative px-3" href="{{ url_for('view_cart') }}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Cart">
+                                <i class="fas fa-shopping-cart nav-icon"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link icon-link px-3" href="{{ url_for('profile_wishlist') }}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Wishlist">
+                                <i class="fas fa-heart nav-icon"></i>
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link icon-link dropdown-toggle px-3" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-bell nav-icon"></i>
+                                {% if current_user.unread_notifications_count > 0 %}
+                                <span class="position-absolute top-25 start-75 translate-middle badge rounded-pill bg-danger notification-badge">
+                                    {{ current_user.unread_notifications_count }}
+                                    <span class="visually-hidden">unread notifications</span>
+                                </span>
+                                {% endif %}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end notification-dropdown shadow border-0" style="width: 320px; max-height: 400px; overflow-y: auto;">
+                                <div class="dropdown-header d-flex justify-content-between align-items-center">
+                                    <span>Notifications</span>
+                                    {% if notifications %}
+                                    <a href="{{ url_for('mark_all_notifications_read') }}" class="text-primary small">Mark all as read</a>
+                                    {% endif %}
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                
+                                {% if notifications %}
+                                    {% for notification in notifications %}
+                                    <a class="dropdown-item notification-item {% if not notification.is_read %}unread{% endif %}" href="{{ notification.link }}">
+                                        <div class="d-flex align-items-center">
+                                            {% if notification.type == 'new_arrival' %}
+                                            <div class="notification-icon bg-primary text-white"><i class="fas fa-tshirt"></i></div>
+                                            {% elif notification.type == 'sale' %}
+                                            <div class="notification-icon bg-success text-white"><i class="fas fa-tag"></i></div>
+                                            {% elif notification.type == 'exclusive' %}
+                                            <div class="notification-icon bg-warning text-white"><i class="fas fa-star"></i></div>
+                                            {% else %}
+                                            <div class="notification-icon bg-info text-white"><i class="fas fa-bell"></i></div>
+                                            {% endif %}
+                                            <div class="notification-content">
+                                                <div class="notification-text">{{ notification.message }}</div>
+                                                <div class="notification-time">{{ notification.created_at|time_ago }}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    {% endfor %}
+                                    
+                                    {% if notifications|length > 5 %}
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item text-center" href="{{ url_for('view_all_notifications') }}">View all notifications</a>
+                                    {% endif %}
+                                {% else %}
+                                <div class="dropdown-item text-center py-3">
+                                    <p class="text-muted mb-0">No notifications yet</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link icon-link dropdown-toggle px-3" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user-circle nav-icon"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="navbarDropdown">
+                                <div class="dropdown-header text-center">Hi, {{ current_user.first_name }}!</div>
+                                <div class="dropdown-divider"></div>
+                                {% if current_user.is_admin %}
+                                <a class="dropdown-item" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-user-shield me-2 text-primary"></i>Admin Dashboard</a>
+                                <div class="dropdown-divider"></div>
+                                {% endif %}
+                                <a class="dropdown-item" href="{{ url_for('profile_dashboard') }}"><i class="fas fa-tachometer-alt me-2 text-primary"></i>Dashboard</a>
+                                <a class="dropdown-item" href="{{ url_for('profile_orders') }}"><i class="fas fa-box me-2 text-primary"></i>My Orders</a>
+                                <a class="dropdown-item" href="{{ url_for('profile_wishlist') }}"><i class="fas fa-heart me-2 text-primary"></i>Wishlist</a>
+                                <a class="dropdown-item" href="{{ url_for('profile_settings') }}"><i class="fas fa-cog me-2 text-primary"></i>Settings</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2 text-primary"></i>Logout</a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item me-2">
+                            <a class="nav-link btn btn-outline-light btn-sm px-3" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link btn btn-light text-primary btn-sm px-3" href="{{ url_for('register') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mt-5 pt-4" style="min-height: calc(100vh - 450px);">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light pt-5 pb-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <!-- <img src="{{ url_for('static', filename='images/logo-white.png') }}" alt="Kickx" height="40"> -->
+                        <h3 class="mb-0 ms-2 fw-bold">Kickx</h3>
+                        <span class="badge bg-light text-dark ms-2" style="font-size: 0.6rem; padding: 0.25rem 0.5rem;">PREMIUM</span>
+                    </div>
+                    <p class="mb-4">Your ultimate destination for authentic sneakers. We bring you the latest releases and classic favorites from top brands around the world.</p>
+                    <div class="d-flex gap-3 social-links">
+                        <a href="#" class="btn btn-outline-light rounded-circle" aria-label="Facebook" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow us on Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-light rounded-circle" aria-label="Twitter" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow us on Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-light rounded-circle" aria-label="Instagram" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow us on Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-light rounded-circle" aria-label="Pinterest" data-bs-toggle="tooltip" data-bs-placement="top" title="Follow us on Pinterest"><i class="fab fa-pinterest-p"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5 class="mb-4 text-uppercase fw-bold" style="font-size: 1rem;">Shop</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li class="mb-2"><a href="{{ url_for('product_catalog') }}" class="text-light text-decoration-none">All Sneakers</a></li>
+                        <li class="mb-2"><a href="{{ url_for('new_arrivals') }}" class="text-light text-decoration-none">New Arrivals</a></li>
+                        <li class="mb-2"><a href="{{ url_for('featured') }}" class="text-light text-decoration-none">Featured</a></li>
+                        <li class="mb-2"><a href="{{ url_for('trending_products') }}" class="text-light text-decoration-none">Trending</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Sale</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5 class="mb-4 text-uppercase fw-bold" style="font-size: 1rem;">Support</h5>
+                    <ul class="list-unstyled footer-links">
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Contact Us</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">FAQ</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Shipping Info</a></li>
+                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Returns</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <h5 class="mb-4 text-uppercase fw-bold" style="font-size: 1rem;">Subscribe</h5>
+                    <p>Get updates on new releases and exclusive offers.</p>
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Your email address">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                    <div class="payment-methods mt-4">
+                        <h6 class="mb-3 text-uppercase" style="font-size: 0.85rem;">Payment Methods</h6>
+                        <div class="d-flex gap-2">
+                            <i class="fab fa-cc-paypal fa-2x" data-bs-toggle="tooltip" data-bs-placement="top" title="PayPal"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4 bg-secondary">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2025 Kickx. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <ul class="list-inline mb-0">
+                        <li class="list-inline-item"><a href="#" class="text-light text-decoration-none small">Privacy Policy</a></li>
+                        <li class="list-inline-item ms-3"><a href="#" class="text-light text-decoration-none small">Terms of Service</a></li>
+                        <li class="list-inline-item ms-3"><a href="#" class="text-light text-decoration-none small">Accessibility</a></li>
+                        <li class="list-inline-item ms-3"><a href="#" class="text-light text-decoration-none small">Clear Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to top button -->
+    <a href="#" class="back-to-top" id="backToTop" data-bs-toggle="tooltip" data-bs-placement="left" title="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+
+    <!-- Cookie consent banner -->
+    <div class="cookie-consent" id="cookieConsent">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-9">
+                    <p class="mb-2 mb-md-0">We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.</p>
+                </div>
+                <div class="col-md-3 text-md-end">
+                    <button class="btn btn-sm btn-primary me-2" id="acceptCookies">Accept</button>
+                    <button class="btn btn-sm btn-outline-light" id="cookieSettings">Settings</button>
+                    <a href="#" class="btn btn-sm btn-danger ms-2">Clear Cookies</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Initialize tooltips and dropdowns
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            
+            // Initialize dropdowns
+            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'))
+            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                return new bootstrap.Dropdown(dropdownToggleEl)
+            });
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 50) {
+                document.querySelector('.navbar').classList.add('scrolled');
+            } else {
+                document.querySelector('.navbar').classList.remove('scrolled');
+            }
+        });
+        
+        // Back to top button
+        window.addEventListener('scroll', function() {
+            var backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+        
+        document.getElementById('backToTop').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+    {{ bootstrap.load_js() }}
+</body>
+</html> 

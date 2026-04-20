@@ -1,0 +1,297 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Recommendation Engine Settings - Kickx Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Recommendation Engine Settings</li>
+        </ol>
+    </nav>
+
+    <!-- Page header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Recommendation Engine Settings</h2>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <div class="d-flex align-items-center">
+                <div class="card-icon me-3" style="background-color: #6f42c1;">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h5 class="card-title mb-0">Recommendation Engine Configuration</h5>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <form id="recommendationSettingsForm" method="POST">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Content-Based Weight</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" id="contentWeight" name="content_weight" value="0.6" step="0.1" min="0" max="1">
+                                    <div class="form-text">Weight for product attribute similarity (must sum to 1.0 with collaborative weight)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Collaborative Weight</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" id="collaborativeWeight" name="collaborative_weight" value="0.4" step="0.1" min="0" max="1">
+                                    <div class="form-text">Weight for user behavior similarity (must sum to 1.0 with content weight)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Min Confidence Score</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" id="minConfidence" name="min_confidence" value="0.3" step="0.1" min="0" max="1">
+                                    <div class="form-text">Minimum confidence score to show a recommendation (0.0-1.0)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Max Recommendations</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" id="maxRecommendations" name="max_recommendations" value="6" min="1" max="20">
+                                    <div class="form-text">Maximum number of recommendations to show per product</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Personalized Home</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enablePersonalized" name="enable_personalized" checked>
+                                    <label class="form-check-label" for="enablePersonalized">
+                                        Enable Personalized Home
+                                    </label>
+                                </div>
+                                <div class="form-text">Show personalized recommendations on the home page for logged-in users</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Refresh Interval (hours)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" id="refreshInterval" name="refresh_interval" value="24" min="1" max="168">
+                                    <div class="form-text">How often to refresh recommendation data</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Trending Window (days)</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <input type="number" class="form-control" id="trendingWindow" name="trending_window" value="7" min="1" max="30">
+                                    <div class="form-text">Time window for identifying trending products</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" id="rebuildModelBtn" class="btn btn-warning">
+                        <i class="fas fa-sync me-1"></i> Rebuild Model
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Settings
+                    </button>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Card styling */
+.dashboard-card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+/* Form styles */
+.form-control {
+    border-radius: 8px;
+    padding: 10px 15px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+.form-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Switch styles */
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-switch .form-check-input {
+    width: 2.5em;
+    height: 1.2em;
+}
+
+/* Button styles */
+.btn {
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    box-shadow: 0 2px 5px rgba(var(--primary-rgb), 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn-warning {
+    color: #fff;
+    background-color: #fd7e14;
+    border-color: #fd7e14;
+}
+
+.btn-warning:hover {
+    color: #fff;
+    background-color: #e76b00;
+    border-color: #e76b00;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(253, 126, 20, 0.3);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validation for weights summing to 1.0
+    const contentWeightInput = document.getElementById('contentWeight');
+    const collaborativeWeightInput = document.getElementById('collaborativeWeight');
+    
+    function validateWeights() {
+        const contentWeight = parseFloat(contentWeightInput.value);
+        const collaborativeWeight = parseFloat(collaborativeWeightInput.value);
+        const sum = contentWeight + collaborativeWeight;
+        
+        if (sum !== 1.0) {
+            alert('Content-based weight and collaborative weight must sum to 1.0');
+            return false;
+        }
+        return true;
+    }
+    
+    // Update collaborative weight when content weight changes
+    contentWeightInput.addEventListener('change', function() {
+        const contentWeight = parseFloat(this.value);
+        if (contentWeight >= 0 && contentWeight <= 1) {
+            collaborativeWeightInput.value = (1 - contentWeight).toFixed(1);
+        }
+    });
+    
+    // Update content weight when collaborative weight changes
+    collaborativeWeightInput.addEventListener('change', function() {
+        const collaborativeWeight = parseFloat(this.value);
+        if (collaborativeWeight >= 0 && collaborativeWeight <= 1) {
+            contentWeightInput.value = (1 - collaborativeWeight).toFixed(1);
+        }
+    });
+    
+    // Form submission validation
+    document.getElementById('recommendationSettingsForm').addEventListener('submit', function(e) {
+        if (!validateWeights()) {
+            e.preventDefault();
+        }
+    });
+    
+    // Rebuild model button
+    document.getElementById('rebuildModelBtn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to rebuild the recommendation model? This may take several minutes.')) {
+            // Here you would add AJAX call to trigger model rebuild
+            alert('Model rebuild initiated. This process will run in the background.');
+        }
+    });
+});
+</script>
+{% endblock %} 

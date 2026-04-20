@@ -1,0 +1,318 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Recommendation Engine - Kickx{% endblock %}
+
+{% block header_title %}Recommendation Engine{% endblock %}
+
+{% block styles %}
+<style>
+    /* Recommendation Count Badge */
+    .recommendation-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background-color: #17a2b8;
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .recommendation-count.high {
+        background-color: #0d6efd;
+    }
+    
+    /* Status Badges */
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: capitalize;
+        display: inline-block;
+    }
+
+    .status-badge.active {
+        background-color: rgba(25, 135, 84, 0.15);
+        color: #198754;
+    }
+
+    .status-badge.partial {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+    }
+
+    .status-badge.inactive {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+    }
+    
+    /* Recommendation Types */
+    .recommendation-types {
+        background-color: #f8f9fa;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 30px;
+    }
+    
+    .recommendation-type {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .recommendation-type:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .recommendation-type h5 {
+        font-size: 1rem;
+        color: #0d6efd;
+        margin-bottom: 5px;
+    }
+    
+    .recommendation-type p {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Recommendation Engine</li>
+        </ol>
+    </nav>
+    
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i> Recommendation Engine Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>The Kickx recommendation engine uses a hybrid approach combining content-based and collaborative filtering to provide personalized product recommendations to users.</p>
+                    
+                    <div class="recommendation-types">
+                        <div class="recommendation-type">
+                            <h5><i class="fas fa-tag me-2"></i> Content-Based Filtering</h5>
+                            <p>Recommends products based on similar attributes (brand, category, price range, color) to items a user has viewed or purchased.</p>
+                        </div>
+                        
+                        <div class="recommendation-type">
+                            <h5><i class="fas fa-users me-2"></i> Collaborative Filtering</h5>
+                            <p>Recommends products based on the behavior of similar users, finding patterns in purchase history, reviews, and wishlists.</p>
+                        </div>
+                        
+                        <div class="recommendation-type">
+                            <h5><i class="fas fa-sync me-2"></i> Hybrid Approach</h5>
+                            <p>Combines both methods for more accurate and diverse recommendations, balancing product similarity with user behavior patterns.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cogs me-2"></i> Recommendation Engine Settings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('admin_recommendation_engine') }}">
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Content-Based Weight</label>
+                                <input type="number" class="form-control" name="content_based_weight" value="{{ settings.content_based_weight }}" min="0" max="1" step="0.1" required>
+                                <div class="form-text">Weight for product attribute similarity (must sum to 1.0 with collaborative weight)</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Collaborative Weight</label>
+                                <input type="number" class="form-control" name="collaborative_weight" value="{{ settings.collaborative_weight }}" min="0" max="1" step="0.1" required>
+                                <div class="form-text">Weight for user behavior similarity (must sum to 1.0 with content weight)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Min Confidence Score</label>
+                                <input type="number" class="form-control" name="min_recommendation_confidence" value="{{ settings.min_recommendation_confidence }}" min="0" max="1" step="0.1" required>
+                                <div class="form-text">Minimum confidence score to show a recommendation (0.0-1.0)</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Max Recommendations</label>
+                                <input type="number" class="form-control" name="max_recommendations_per_product" value="{{ settings.max_recommendations_per_product }}" min="1" max="12" step="1" required>
+                                <div class="form-text">Maximum number of recommendations to show per product</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="enablePersonalizedHome" name="enable_personalized_home" {% if settings.enable_personalized_home %}checked{% endif %}>
+                                    <label class="form-check-label" for="enablePersonalizedHome">Enable Personalized Home</label>
+                                </div>
+                                <div class="form-text ms-4">Show personalized recommendations on the home page for logged-in users</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Refresh Interval (hours)</label>
+                                <input type="number" class="form-control" name="recommendation_refresh_hours" value="{{ settings.recommendation_refresh_hours }}" min="1" max="72" step="1" required>
+                                <div class="form-text">How often to refresh recommendation data</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Trending Window (days)</label>
+                                <input type="number" class="form-control" name="trending_timespan_days" value="{{ settings.trending_timespan_days }}" min="1" max="30" step="1" required>
+                                <div class="form-text">Time window for identifying trending products</div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-save me-1"></i> Save Settings
+                            </button>
+                            
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#rebuildModal">
+                                <i class="fas fa-sync-alt me-1"></i> Rebuild Model
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i> Top Recommended Products
+                    </h5>
+                    <a href="{{ url_for('admin_products') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye me-1"></i> View All
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Image</th>
+                                    <th class="text-center">Recommendation Count</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for rec in recent_recommendations %}
+                                <tr>
+                                    <td>{{ rec.product.name }}</td>
+                                    <td>
+                                        {% if rec.product.image_url %}
+                                        <img src="{{ rec.product.image_url }}" alt="{{ rec.product.name }}" width="50" height="50" class="rounded">
+                                        {% else %}
+                                        <div class="bg-light rounded text-center" style="width:50px;height:50px;">
+                                            <i class="fas fa-image text-secondary" style="line-height:50px;"></i>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="recommendation-count {% if rec.recommendation_count > 5 %}high{% endif %}">{{ rec.recommendation_count }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="{{ url_for('admin_edit_product', product_id=rec.product.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                
+                                {% if not recent_recommendations %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No recommendation data available. Try rebuilding the model.
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rebuild Model Confirmation Modal -->
+<div class="modal fade" id="rebuildModal" tabindex="-1" aria-labelledby="rebuildModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rebuildModalLabel">Confirm Model Rebuild</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to rebuild the recommendation model? This process may take some time to complete.</p>
+                <p class="text-warning"><i class="fas fa-exclamation-triangle me-2"></i> This will not affect active user sessions, but new recommendations will not be available until the process completes.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{{ url_for('admin_recommendation_engine') }}" method="POST" class="d-inline">
+                    <input type="hidden" name="action" value="rebuild">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-sync-alt me-1"></i> Rebuild Model
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Ensure content-based and collaborative weights sum to 1.0
+    document.addEventListener('DOMContentLoaded', function() {
+        const contentWeightInput = document.querySelector('input[name="content_based_weight"]');
+        const collabWeightInput = document.querySelector('input[name="collaborative_weight"]');
+        
+        if (contentWeightInput && collabWeightInput) {
+            contentWeightInput.addEventListener('change', function() {
+                const contentWeight = parseFloat(contentWeightInput.value);
+                const collabWeight = 1.0 - contentWeight;
+                collabWeightInput.value = Math.round(collabWeight * 10) / 10;
+            });
+            
+            collabWeightInput.addEventListener('change', function() {
+                const collabWeight = parseFloat(collabWeightInput.value);
+                const contentWeight = 1.0 - collabWeight;
+                contentWeightInput.value = Math.round(contentWeight * 10) / 10;
+            });
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,631 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Admin Dashboard - Kickx{% endblock %}
+
+
+{% block content %}
+<!-- Recent Orders -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Orders</h5>
+        <a href="{{ url_for('admin_orders') }}" class="btn btn-sm btn-primary">View All</a>
+    </div>
+    <div class="card-body">
+        {% if recent_orders %}
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                            <td>{{ order.user.full_name }}</td>
+                            <td>{{ order.created_at.strftime('%b %d, %Y') }}</td>
+                            <td>₱{{ order.total_amount }}</td>
+                            <td>
+                                <span class="status-badge {{ order.status.lower() }}">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                            <td>
+                                <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-shopping-bag"></i>
+                <p>No orders found</p>
+                <a href="{{ url_for('admin_orders') }}" class="btn btn-primary">View All Orders</a>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+
+<!-- Verified Products -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Verified Authentic Products</h5>
+        <a href="{{ url_for('admin_products') }}" class="btn btn-sm btn-primary">View All Products</a>
+    </div>
+    <div class="card-body">
+        {% if verified_products %}
+        <div class="table-responsive">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in verified_products %}
+                    <tr>
+                        <td>#{{ product.id }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.brand.name if product.brand else 'N/A' }}</td>
+                        <td>₱{{ "%.2f"|format(product.price) }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_edit_product', product_id=product.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-sm btn-outline-secondary">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-check-circle text-success"></i>
+                <p>No verified products yet</p>
+                <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">Add Verified Product</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<h4 class="mb-3">Quick Actions</h4>
+<div class="actions-container">
+    <a href="{{ url_for('admin_add_product') }}" class="action-card">
+        <div class="action-icon">
+            <i class="fas fa-plus"></i>
+        </div>
+        <div class="action-title">Add Product</div>
+        <div class="action-description">Create a new product listing with details and images</div>
+    </a>
+    
+    <a href="{{ url_for('admin_orders') }}" class="action-card">
+        <div class="action-icon">
+            <i class="fas fa-clipboard-list"></i>
+        </div>
+        <div class="action-title">Manage Orders</div>
+        <div class="action-description">View and update customer order statuses</div>
+    </a>
+    
+    <a href="{{ url_for('admin_users') }}" class="action-card">
+        <div class="action-icon">
+            <i class="fas fa-user-cog"></i>
+        </div>
+        <div class="action-title">User Management</div>
+        <div class="action-description">Manage user accounts and permissions</div>
+    </a>
+    
+    <a href="{{ url_for('admin_recommendation_engine') }}" class="action-card">
+        <div class="action-icon">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="action-title">Recommendation Engine</div>
+        <div class="action-description">Configure the recommendation engine</div>
+    </a>
+</div>
+
+<script>
+// Revenue Chart
+const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+const revenueChart = new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+            label: 'Revenue',
+            data: [2100, 3200, 2800, 4800, 3900, 5200, 6100],
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            borderColor: '#3498db',
+                borderWidth: 2,
+            pointBackgroundColor: '#3498db',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 4,
+            tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+        maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                    display: true,
+                    drawBorder: false,
+                    }
+                },
+                x: {
+                    grid: {
+                    display: false,
+                    drawBorder: false
+                    }
+                }
+            }
+        }
+    });
+    
+// Orders Chart
+const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+const ordersChart = new Chart(ordersCtx, {
+        type: 'bar',
+        data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+            label: 'Orders',
+            data: [12, 19, 15, 22, 18, 25, 30],
+            backgroundColor: '#27ae60',
+            borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+        maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                    display: true,
+                    drawBorder: false,
+                    }
+                },
+                x: {
+                    grid: {
+                    display: false,
+                    drawBorder: false
+                    }
+                }
+            }
+        }
+    });
+    
+// Chart Filter Buttons
+document.querySelectorAll('.chart-filters .btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const parent = this.closest('.chart-filters');
+        parent.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+// Refresh Button
+document.getElementById('refreshStats').addEventListener('click', function() {
+    const button = this;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Refreshing...';
+    
+    // Simulate refresh
+    setTimeout(() => {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-sync-alt me-1"></i> Refresh';
+        
+        // Show success toast
+        const toast = document.createElement('div');
+        toast.className = 'admin-toast success';
+        toast.innerHTML = '<i class="fas fa-check-circle me-2"></i> Statistics updated successfully!';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }, 100);
+    }, 1500);
+    });
+</script>
+
+{% endblock %} 
+
+
+
+
+{% block styles %}
+<style>
+    /* Dashboard Grid Layout */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .chart-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .actions-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Stat Cards */
+    .stat-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 1.25rem;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover);
+    }
+    
+    .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        margin-bottom: 0.75rem;
+        color: white;
+    }
+    
+    .stat-icon.purple {
+        background: linear-gradient(135deg, #8e44ad, #9b59b6);
+    }
+    
+    .stat-icon.green {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+    }
+    
+    .stat-icon.blue {
+        background: linear-gradient(135deg, #2980b9, #3498db);
+    }
+    
+    .stat-icon.orange {
+        background: linear-gradient(135deg, #d35400, #e67e22);
+    }
+    
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--text-color);
+    }
+    
+    .stat-label {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-change {
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .stat-change i {
+        margin-right: 0.25rem;
+    }
+    
+    .stat-change.positive {
+        color: var(--success-color);
+    }
+    
+    .stat-change.negative {
+        color: var(--danger-color);
+    }
+    
+    /* Chart Cards */
+    .chart-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 1.25rem;
+        border: 1px solid var(--border-color);
+        height: 100%;
+    }
+    
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .chart-filters {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .chart-filters .btn {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        border-radius: 6px;
+        background: var(--light-bg);
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+        transition: all 0.2s ease;
+    }
+    
+    .chart-filters .btn:hover, .chart-filters .btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+    
+    .chart-canvas-container {
+        height: 250px;
+        position: relative;
+    }
+    
+    /* Admin Table */
+    .admin-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .admin-table th {
+        text-align: left;
+        padding: 1rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        background: var(--light-bg);
+        border-bottom: 1px solid var(--border-color);
+    }
+    
+    .admin-table th:first-child {
+        border-top-left-radius: 8px;
+    }
+    
+    .admin-table th:last-child {
+        border-top-right-radius: 8px;
+        text-align: right;
+    }
+    
+    .admin-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color);
+        vertical-align: middle;
+    }
+    
+    .admin-table td:last-child {
+        text-align: right;
+    }
+    
+    .admin-table tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .admin-table tr:hover {
+        background-color: var(--hover-bg);
+    }
+    
+    /* Status Badges */
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .status-badge.completed {
+        background-color: rgba(46, 204, 113, 0.15);
+        color: #27ae60;
+    }
+    
+    .status-badge.processing {
+        background-color: rgba(52, 152, 219, 0.15);
+        color: #2980b9;
+    }
+    
+    .status-badge.pending {
+        background-color: rgba(230, 126, 34, 0.15);
+        color: #d35400;
+    }
+    
+    .status-badge.cancelled {
+        background-color: rgba(231, 76, 60, 0.15);
+        color: #c0392b;
+    }
+    
+    /* Action Cards */
+    .action-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        height: 100%;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-shadow-hover);
+        text-decoration: none;
+    }
+    
+    .action-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        margin-bottom: 1rem;
+        background: var(--primary-color);
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .action-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+    
+    .action-description {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+    
+    /* Empty States */
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .empty-state p {
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+    
+    /* Refresh Button */
+    #refreshStats {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 1rem;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        font-weight: 500;
+        border: none;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    #refreshStats:hover {
+        background: var(--primary-dark);
+    }
+    
+    #refreshStats i {
+        margin-right: 0.5rem;
+    }
+    
+    /* Toast Notification */
+    .admin-toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        padding: 1rem 1.5rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1000;
+    }
+    
+    .admin-toast.success {
+        border-left: 4px solid var(--success-color);
+    }
+    
+    .admin-toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 1200px) {
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .chart-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .actions-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 767px) {
+        .stats-container,
+        .actions-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

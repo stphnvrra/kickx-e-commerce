@@ -1,0 +1,657 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}User Management - Kickx{% endblock %}
+
+{% block header_title %}User Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Users</li>
+        </ol>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">User Management</h2>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin_add_user') }}" class="btn btn-primary">
+                <i class="fas fa-user-plus me-1"></i> Add New User
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <form method="GET" action="{{ url_for('admin_users') }}">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-5">
+                        <div class="search-section">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" name="search" class="form-control search-input" placeholder="Search by name or email..." value="{{ request.args.get('search', '') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="d-flex gap-3 flex-wrap justify-content-md-end">
+                            <select class="form-select" name="role">
+                                <option value="">All Roles</option>
+                                <option value="user" {% if request.args.get('role') == 'user' %}selected{% endif %}>Customer</option>
+                                <option value="admin" {% if request.args.get('role') == 'admin' %}selected{% endif %}>Admin</option>
+                            </select>
+                            
+                            <select class="form-select" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="active" {% if request.args.get('status') == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if request.args.get('status') == 'inactive' %}selected{% endif %}>Inactive</option>
+                            </select>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-1"></i> Apply Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Nav tabs for admin/customer separation -->
+    <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="customers-tab" data-bs-toggle="tab" data-bs-target="#customers" type="button" role="tab" aria-controls="customers" aria-selected="true">
+                <i class="fas fa-users me-2"></i>Customers
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="admins-tab" data-bs-toggle="tab" data-bs-target="#admins" type="button" role="tab" aria-controls="admins" aria-selected="false">
+                <i class="fas fa-user-shield me-2"></i>Admins
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab content -->
+    <div class="tab-content" id="userTabsContent">
+        <!-- CUSTOMERS TAB -->
+        <div class="tab-pane fade show active" id="customers" role="tabpanel" aria-labelledby="customers-tab">
+            <!-- Customers Table -->
+            <div class="dashboard-card card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon users-icon me-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Customers</h5>
+                        <span class="badge bg-primary ms-2">{{ customers|default([])|length }} customer{% if customers|default([])|length != 1 %}s{% endif %}</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover admin-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users.items %}
+                                {% if not user.is_admin %}
+                                <tr>
+                                    <td>#{{ user.id }}</td>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="status-badge status-delivered">
+                                            <i class="fas fa-check-circle me-1"></i> Active
+                                        </span>
+                                        {% else %}
+                                        <span class="status-badge status-cancelled">
+                                            <i class="fas fa-times-circle me-1"></i> Inactive
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.created_at.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center">
+                                            <a href="{{ url_for('admin_view_user', user_id=user.id) }}" class="btn btn-sm btn-outline-primary action-btn me-2" data-bs-toggle="tooltip" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin_edit_user', user_id=user.id) }}" class="btn btn-sm btn-outline-info action-btn me-2" data-bs-toggle="tooltip" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary action-btn me-2 toggle-status" data-bs-toggle="modal" data-bs-target="#statusModal{{ user.id }}" data-user-id="{{ user.id }}" data-current-status="{{ 'active' if user.is_active else 'inactive' }}" title="Toggle Status">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger action-btn delete-user" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}" data-user-id="{{ user.id }}" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="fas fa-users"></i>
+                                            <p>No customers found matching your criteria</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMINS TAB -->
+        <div class="tab-pane fade" id="admins" role="tabpanel" aria-labelledby="admins-tab">
+            <!-- Admins Table -->
+            <div class="dashboard-card card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon users-icon me-3" style="background-color: #0d6efd;">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Administrators</h5>
+                        <span class="badge bg-primary ms-2">{{ admins|default([])|length }} admin{% if admins|default([])|length != 1 %}s{% endif %}</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover admin-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users.items %}
+                                {% if user.is_admin %}
+                                <tr>
+                                    <td>#{{ user.id }}</td>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="status-badge status-delivered">
+                                            <i class="fas fa-check-circle me-1"></i> Active
+                                        </span>
+                                        {% else %}
+                                        <span class="status-badge status-cancelled">
+                                            <i class="fas fa-times-circle me-1"></i> Inactive
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.created_at.strftime('%b %d, %Y') }}</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center">
+                                            <a href="{{ url_for('admin_view_user', user_id=user.id) }}" class="btn btn-sm btn-outline-primary action-btn me-2" data-bs-toggle="tooltip" title="View">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('admin_edit_user', user_id=user.id) }}" class="btn btn-sm btn-outline-info action-btn me-2" data-bs-toggle="tooltip" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary action-btn me-2 toggle-status" data-bs-toggle="modal" data-bs-target="#statusModal{{ user.id }}" data-user-id="{{ user.id }}" data-current-status="{{ 'active' if user.is_active else 'inactive' }}" title="Toggle Status">
+                                                <i class="fas fa-power-off"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger action-btn delete-user" data-bs-toggle="modal" data-bs-target="#deleteModal{{ user.id }}" data-user-id="{{ user.id }}" title="Delete">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="empty-state">
+                                            <i class="fas fa-user-shield"></i>
+                                            <p>No administrators found matching your criteria</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if users.pages > 1 %}
+    <nav aria-label="User pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{ 'disabled' if not users.has_prev else '' }}">
+                <a class="page-link" href="{{ url_for('admin_users', page=users.prev_num, **request.args) if users.has_prev else '#' }}" tabindex="{{ '-1' if not users.has_prev else '0' }}" aria-disabled="{{ 'true' if not users.has_prev else 'false' }}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            
+            {% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    <li class="page-item {{ 'active' if page_num == users.page else '' }}">
+                        <a class="page-link" href="{{ url_for('admin_users', page=page_num, **request.args) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#">…</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            <li class="page-item {{ 'disabled' if not users.has_next else '' }}">
+                <a class="page-link" href="{{ url_for('admin_users', page=users.next_num, **request.args) if users.has_next else '#' }}" tabindex="{{ '-1' if not users.has_next else '0' }}" aria-disabled="{{ 'true' if not users.has_next else 'false' }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% for user in users.items %}
+    <!-- Toggle Status Modal -->
+    <div class="modal fade" id="statusModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-power-off me-2 text-warning"></i>
+                        Change User Status
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to change the status of <strong>{{ user.first_name }} {{ user.last_name }}</strong> from <strong>{{ 'Active' if user.is_active else 'Inactive' }}</strong> to <strong>{{ 'Inactive' if user.is_active else 'Active' }}</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <form action="{{ url_for('admin_edit_user', user_id=user.id) }}" method="POST">
+                        <input type="hidden" name="is_active" value="{{ 0 if user.is_active else 1 }}">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-power-off me-1"></i> Change Status
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal{{ user.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
+                        Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong>{{ user.first_name }} {{ user.last_name }}</strong>?</p>
+                    <p class="text-danger">This action cannot be undone and will remove all user data.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <form action="{{ url_for('admin_edit_user', user_id=user.id) }}" method="POST">
+                        <input type="hidden" name="delete" value="1">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> Delete User
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Tab styling */
+.nav-tabs {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.nav-tabs .nav-link {
+    margin-bottom: -1px;
+    border: none;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-bottom: 3px solid transparent;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    color: var(--primary-color);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background-color: transparent;
+    border-bottom: 3px solid var(--primary-color);
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.users-icon {
+    background-color: #6f42c1;
+}
+
+/* Search */
+.search-section {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    opacity: 0.7;
+}
+
+.search-input {
+    padding-left: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+.form-select {
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    padding-left: 16px;
+    background-position: right 16px center;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.status-badge.status-pending {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+.status-badge.status-processing {
+    background-color: rgba(13, 110, 253, 0.15);
+    color: #0d6efd;
+}
+
+.status-badge.status-shipped {
+    background-color: rgba(25, 135, 84, 0.15);
+    color: #198754;
+}
+
+.status-badge.status-delivered {
+    background-color: rgba(25, 135, 84, 0.15);
+    color: #198754;
+}
+
+.status-badge.status-cancelled {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+/* Admin Table */
+.admin-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.admin-table td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.admin-table tr:hover {
+    background-color: rgba(236, 82, 40, 0.05);
+}
+
+/* Action Buttons */
+.action-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.action-btn i {
+    font-size: 0.9rem;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    border-radius: 10px;
+    margin: 0 4px;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background-color: #f9fafb;
+    color: var(--primary-color);
+    border-color: #d1d5db;
+    z-index: 2;
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 3px 6px rgba(var(--primary-rgb), 0.2);
+    font-weight: 600;
+}
+
+.page-item.disabled .page-link {
+    color: #9ca3af;
+    background-color: #f3f4f6;
+    border-color: #e5e7eb;
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 20px 24px;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 16px 24px;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* Button styles */
+.btn {
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    box-shadow: 0 2px 5px rgba(var(--primary-rgb), 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn i {
+    font-size: 0.9rem;
+}
+
+/* Small buttons for actions */
+.btn-sm {
+    padding: 0.375rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+
+.btn-outline-primary:hover, 
+.btn-outline-success:hover,
+.btn-outline-secondary:hover,
+.btn-outline-danger:hover,
+.btn-outline-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .btn-sm {
+        padding: 0.25rem 0.4rem;
+    }
+    
+    .admin-table th, 
+    .admin-table td {
+        padding: 0.75rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    if (tooltipTriggerList.length > 0) {
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl, {
+                delay: { show: 500, hide: 100 }
+            });
+        });
+    }
+});
+</script>
+{% endblock %} 

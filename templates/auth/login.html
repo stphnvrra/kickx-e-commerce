@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Kickx{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow">
+                <div class="card-body p-5">
+                    
+                    <h1 class="text-center mb-4">Login</h1>
+                    <form method="POST" action="{{ url_for('login') }}">
+            
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">Remember me</label>
+                        </div>
+                        
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn btn-primary py-2">Login</button>
+                        </div>
+                        
+                        <div class="text-center">
+                            <p class="mb-2">
+                                <a href="{{ url_for('forgot_password') }}" class="text-decoration-none">Forgot your password?</a>
+                            </p>
+                            <p class="mb-0">
+                                Don't have an account? <a href="{{ url_for('register') }}" class="text-decoration-none">Register</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="mb-0 text-muted small">
+                    By logging in, you agree to our <a href="#" class="text-decoration-none">Terms of Service</a> and <a href="#" class="text-decoration-none">Privacy Policy</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+.card-body {
+    border-radius: 10px;
+}
+
+.form-control {
+    border-radius: 5px;
+    padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(236, 82, 40, 0.25);
+}
+
+.btn-primary {
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+</style>
+{% endblock %} 

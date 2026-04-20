@@ -1,0 +1,602 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}{{ 'Edit' if product else 'Add' }} Product - Kickx{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <div class="content-header">
+        <h1>{{ 'Edit' if product else 'Add New' }} Product</h1>
+    </div>
+    
+    <div class="content-body">
+        <form method="POST" enctype="multipart/form-data" class="product-form" action="{{ url_for('admin_edit_product', product_id=product.id) if product else url_for('admin_add_product') }}">
+            
+            <div class="form-card">
+        <div class="card-header">
+                    <h2>Basic Information</h2>
+        </div>
+        <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Product Name</label>
+                            <input type="text" id="name" name="name" class="form-control" value="{{ product.name if product else '' }}" required>
+                        </div>
+            </div>
+
+                    <div class="form-row two-columns">
+                        <div class="form-group">
+                            <label for="slug">Slug</label>
+                            <input type="text" id="slug" name="slug" class="form-control" value="{{ product.slug if product else '' }}" required>
+            </div>
+
+                        <div class="form-group">
+                            <label for="style_code">Style Code</label>
+                            <input type="text" id="style_code" name="style_code" class="form-control" value="{{ product.style_code if product else '' }}">
+                </div>
+            </div>
+
+                    <div class="form-row two-columns">
+                        <div class="form-group">
+                            <label for="brand_id">Brand</label>
+                            <select id="brand_id" name="brand_id" class="form-control" required>
+                                <option value="">Select Brand</option>
+                                <option value="1" {% if product and product.brand_id == 1 %}selected{% endif %}>Nike</option>
+                                <option value="2" {% if product and product.brand_id == 2 %}selected{% endif %}>Adidas</option>
+                                <option value="3" {% if product and product.brand_id == 3 %}selected{% endif %}>Jordan</option>
+                                <option value="4" {% if product and product.brand_id == 4 %}selected{% endif %}>New Balance</option>
+                                <option value="5" {% if product and product.brand_id == 5 %}selected{% endif %}>Puma</option>
+                                <option value="6" {% if product and product.brand_id == 6 %}selected{% endif %}>Under Armour</option>
+                                <option value="7" {% if product and product.brand_id == 7 %}selected{% endif %}>Reebok</option>
+                                <option value="8" {% if product and product.brand_id == 8 %}selected{% endif %}>Converse</option>
+                                <option value="9" {% if product and product.brand_id == 9 %}selected{% endif %}>Vans</option>
+                            </select>
+            </div>
+
+                        <div class="form-group">
+                            <label for="category_id">Category</label>
+                            <select id="category_id" name="category_id" class="form-control" required>
+                                <option value="">Select Category</option>
+                                <option value="1" {% if product and product.category_id == 1 %}selected{% endif %}>Basketball</option>
+                                <option value="2" {% if product and product.category_id == 2 %}selected{% endif %}>Running</option>
+                                <option value="3" {% if product and product.category_id == 3 %}selected{% endif %}>Lifestyle</option>
+                                <option value="4" {% if product and product.category_id == 4 %}selected{% endif %}>Training</option>
+                                <option value="5" {% if product and product.category_id == 5 %}selected{% endif %}>Soccer</option>
+                                <option value="6" {% if product and product.category_id == 6 %}selected{% endif %}>Tennis</option>
+                                <option value="7" {% if product and product.category_id == 7 %}selected{% endif %}>Skateboarding</option>
+                                <option value="8" {% if product and product.category_id == 8 %}selected{% endif %}>Walking</option>
+                            </select>
+                </div>
+            </div>
+        </div>
+
+                    <div class="form-row" style="margin-left: 20px; margin-right: 20px;">
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" class="form-control" rows="3" required>{{ product.description if product else '' }}</textarea>
+                        </div>
+                    </div>
+        </div>
+                    </div>
+                    
+            <div class="form-card">
+                <div class="card-header">
+                    <h2>Pricing & Inventory</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-row two-columns">
+                        <div class="form-group">
+                            <label for="price">Price (₱)</label>
+                            <input type="number" id="price" name="price" step="0.01" min="0" class="form-control" value="{{ product.price if product else '' }}" required>
+        </div>
+
+                        <div class="form-group">
+                            <label for="release_date">Release Date</label>
+                            <input type="date" id="release_date" name="release_date" class="form-control" value="{{ product.release_date.strftime('%Y-%m-%d') if product and product.release_date else '' }}">
+            </div>
+                        </div>
+                        
+                    {% if product %}
+                    <div class="form-row">
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="featured" name="featured" class="form-checkbox" {% if product and product.featured %}checked{% endif %}>
+                            <label for="featured">Featured Product</label>
+                                </div>
+                                </div>
+                            {% endif %}
+                            
+                    <div class="form-row">
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="is_verified" name="is_verified" class="form-checkbox" {% if product and product.is_verified %}checked{% endif %}>
+                            <label for="is_verified">Verified Authentic Product</label>
+                            <small class="text-muted d-block mt-1">Mark this product as authenticated by Kickx experts</small>
+                        </div>
+                    </div>
+        </div>
+</div>
+                
+            <div class="form-card">
+                <div class="card-header">
+                    <h2>Images</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="image_file">Product Image</label>
+                            <input type="file" id="image_file" name="image_file" class="form-control" accept="image/*">
+                            <small class="text-muted">Accepted formats: JPG, PNG, GIF (Max: 5MB)</small>
+                                    </div>
+                    </div>
+                            
+                    {% if product and product.image_url %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Current Image</label>
+                            <div class="current-image-preview">
+                                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="img-thumbnail" style="max-height: 150px;">
+                                    </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    </div>
+                </div>
+                
+            <div class="form-card">
+                <div class="card-header">
+                    <h2>Product Variants</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="color">Color</label>
+                            <input type="text" id="color" name="color" class="form-control" value="{{ product.color if product else '' }}" placeholder="e.g. Black/Red">
+                            <small class="text-muted">Primary color of the product</small>
+                            </div>
+                                    </div>
+                    
+                    <div class="variant-inventory-section">
+                        <h4 class="mb-3">Size & Stock Management</h4>
+                        <p class="text-muted mb-3">Manage available sizes and stock levels for this product color</p>
+                        
+                        <div class="variant-summary mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <h5 class="mb-0">Total Stock: <span id="total-stock-count">0</span></h5>
+                                            <!-- Hidden field to store the total stock value -->
+                                            <input type="hidden" id="stock" name="stock" value="{{ product.stock if product else 0 }}">
+                            </div>
+                                        <div class="col text-end">
+                                            <span class="badge bg-primary" id="selected-sizes-count">0</span> sizes selected
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                            </div>
+                            
+                        <!-- Size grid for US shoe sizes -->
+                        <div class="size-grid">
+                            {% for size in sizes %}
+                            <div class="size-inventory-item">
+                                <div class="form-check">
+                                    {% set ns = namespace(size_checked=False, size_stock=0) %}
+                                    {% if product_sizes %}
+                                        {% for ps in product_sizes %}
+                                            {% if ps.size_id == size.id %}
+                                                {% set ns.size_checked = True %}
+                                                {% set ns.size_stock = ps.stock %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    <input class="form-check-input size-checkbox" type="checkbox" name="sizes" id="size_{{ size.id }}" value="{{ size.id }}" {% if ns.size_checked %}checked{% endif %}>
+                                    <label class="form-check-label" for="size_{{ size.id }}">{{ size.value }}</label>
+                                </div>
+                                <div class="stock-input-wrapper">
+                                    <input type="number" name="size_stock_{{ size.id }}" min="0" value="{{ ns.size_stock }}" class="form-control size-stock" {% if not ns.size_checked %}disabled{% endif %}>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            </div>
+                                
+                        <div class="size-actions mt-3">
+                            <button type="button" id="select-all-sizes" class="btn btn-sm btn-outline-primary">Select All Sizes</button>
+                            <button type="button" id="deselect-all-sizes" class="btn btn-sm btn-outline-secondary">Deselect All</button>
+                        </div>
+                        
+                        <div class="size-inventory-help mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle"></i> Check the sizes you want to add, then enter the stock quantity for each selected size.
+                            </small>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">{{ 'Update' if product else 'Add' }} Product</button>
+                <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.admin-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.content-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.content-header h1 {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.product-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.form-row {
+    margin-bottom: 1rem;
+}
+
+.form-row:last-child {
+    margin-bottom: 0;
+}
+
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.three-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-group label {
+    margin-left: 0.5rem;
+    margin-bottom: 0;
+}
+
+.form-checkbox {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.size-inventory-item {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.size-inventory-item:hover {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.size-inventory-item.active {
+    border-color: var(--primary-color);
+    background-color: rgba(var(--primary-rgb), 0.05);
+    box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.2);
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.form-check-input {
+    margin-right: 0.5rem;
+}
+
+.stock-input-wrapper {
+    margin-top: 0.5rem;
+}
+
+.size-stock {
+    width: 100%;
+    padding: 0.5rem;
+}
+
+.variant-summary {
+    margin-bottom: 1.5rem;
+}
+
+.size-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: #6c757d;
+    border: 1px solid #6c757d;
+    background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    color: white;
+}
+
+.badge {
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    border-radius: 0.25rem;
+}
+
+.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: white;
+}
+
+.variant-inventory-section {
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .two-columns,
+    .three-columns {
+        grid-template-columns: 1fr;
+        gap: 0;
+}
+
+.size-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-generate slug from product name
+        const nameInput = document.getElementById('name');
+        const slugInput = document.getElementById('slug');
+        
+        nameInput.addEventListener('input', function() {
+            // Convert name to slug format
+            const slug = this.value
+                .toLowerCase()
+                .replace(/[^\w\s-]/g, '') // Remove special characters
+                .replace(/\s+/g, '-')     // Replace spaces with hyphens
+                .replace(/-+/g, '-');      // Remove consecutive hyphens
+                
+            slugInput.value = slug;
+        });
+        
+        // Size inventory management
+        const sizeCheckboxes = document.querySelectorAll('.size-checkbox');
+        const sizeStockInputs = document.querySelectorAll('.size-stock');
+        const totalStockInput = document.getElementById('stock');
+        const selectedSizesCount = document.getElementById('selected-sizes-count');
+        const totalStockCount = document.getElementById('total-stock-count');
+        
+        // Select all sizes button
+        document.getElementById('select-all-sizes').addEventListener('click', function() {
+            sizeCheckboxes.forEach(checkbox => {
+                checkbox.checked = true;
+                const stockInput = checkbox.closest('.size-inventory-item').querySelector('.size-stock');
+                stockInput.disabled = false;
+                checkbox.closest('.size-inventory-item').classList.add('active');
+                if (parseInt(stockInput.value) === 0) {
+                    stockInput.value = '1';
+                }
+            });
+            updateSummary();
+        });
+        
+        // Deselect all sizes button
+        document.getElementById('deselect-all-sizes').addEventListener('click', function() {
+            sizeCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                const stockInput = checkbox.closest('.size-inventory-item').querySelector('.size-stock');
+                stockInput.disabled = true;
+                checkbox.closest('.size-inventory-item').classList.remove('active');
+                stockInput.value = '0';
+            });
+            updateSummary();
+        });
+        
+        // Size checkbox toggle handler
+        sizeCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const sizeItem = this.closest('.size-inventory-item');
+                const stockInput = sizeItem.querySelector('.size-stock');
+                
+                stockInput.disabled = !this.checked;
+                
+                if (this.checked) {
+                    sizeItem.classList.add('active');
+                    if (parseInt(stockInput.value) === 0) {
+                        stockInput.value = '1';
+                    }
+                } else {
+                    sizeItem.classList.remove('active');
+                    stockInput.value = '0';
+                }
+                
+                updateSummary();
+            });
+        });
+        
+        // Stock input change handler
+        sizeStockInputs.forEach(input => {
+            input.addEventListener('input', updateSummary);
+        });
+        
+        // Update summary and total stock
+        function updateSummary() {
+            let total = 0;
+            let selectedCount = 0;
+            
+            sizeCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedCount++;
+                    const stockInput = checkbox.closest('.size-inventory-item').querySelector('.size-stock');
+                    const stockValue = parseInt(stockInput.value) || 0;
+                    total += stockValue;
+                }
+            });
+            
+            // Update the hidden stock field for form submission
+            totalStockInput.value = total;
+            selectedSizesCount.textContent = selectedCount;
+            totalStockCount.textContent = total;
+        }
+        
+        // Initialize the UI
+        sizeCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                checkbox.closest('.size-inventory-item').classList.add('active');
+                const stockInput = checkbox.closest('.size-inventory-item').querySelector('.size-stock');
+                stockInput.disabled = false;
+            }
+        });
+        
+        // Run initial calculation
+        updateSummary();
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Payment - Kickx Philippines{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">Payment Information</h1>
+    
+    <!-- Enhanced Return to Cart button at the top -->
+    <div class="mb-4">
+        <a href="{{ url_for('view_cart') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i> Return to Cart
+        </a>
+    </div>
+    
+    <div class="row">
+        <!-- Payment Form -->
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">PayPal Payment</h5>
+                    
+                    <!-- PayPal Form Container -->
+                    <div class="text-center mb-4">
+                        <p class="mb-3">Click the PayPal button below to complete your payment securely</p>
+                        
+                        <!-- PayPal Standard HTML Form (Live Mode) -->
+                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" class="mb-3">
+                            <input type="hidden" name="cmd" value="_xclick">
+                            <input type="hidden" name="business" value="shadowriderph@gmail.com">
+                            <input type="hidden" name="item_name" value="KickX Order">
+                            <!-- <input type="hidden" name="amount" value="{ "%.2f"|format(total + shipping_cost|default(0)) }}"> -->
+                            <input type="hidden" name="amount" value="1">
+                            <input type="hidden" name="currency_code" value="PHP">
+                            
+                            <!-- Custom field to identify the order -->
+                            <input type="hidden" name="custom" value="{{ session.get('checkout_address_id', '') }}">
+                            <input type="hidden" name="invoice" value="KickX_{{ current_user.id }}_{{ session.get('checkout_address_id', '') }}">
+                            
+                            <!-- Return URLs -->
+                            <input type="hidden" name="return" value="{{ url_for('complete_paypal_order', _external=True) }}">
+                            <input type="hidden" name="cancel_return" value="{{ url_for('checkout_payment', _external=True) }}">
+                            <input type="hidden" name="notify_url" value="{{ url_for('complete_paypal_order', _external=True) }}">
+                            
+                            <!-- PayPal display options -->
+                            <input type="hidden" name="no_shipping" value="1">
+                            <input type="hidden" name="no_note" value="1">
+                            <input type="hidden" name="rm" value="1">
+                            
+                            <!-- PayPal Button Image -->
+                            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynowCC_LG.gif" 
+                                   name="submit" alt="PayPal - The safer, easier way to pay online!">
+                            <img alt="" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+                        </form>
+                        
+                        <p class="small text-muted">Your payment will be processed securely by PayPal.</p>
+                        </div>
+                </div>
+            </div>
+            
+            <!-- Payment Security Info -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Secure Payment</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="fas fa-lock text-success me-3 fa-2x"></i>
+                        <div>
+                            <h6 class="mb-1">Your payment information is secure</h6>
+                            <p class="mb-0 small text-muted">All transactions are encrypted and secure with PayPal's industry-leading security protocols.</p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-shield-alt text-success me-3 fa-2x"></i>
+                        <div>
+                            <h6 class="mb-1">Buyer Protection</h6>
+                            <p class="mb-0 small text-muted">PayPal's Buyer Protection covers your eligible purchases if they don't arrive or match their description.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Order Summary</h5>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>₱{{ "%.2f"|format(total|default(0)) }}</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span>{{ "Free" if shipping_cost|default(0) == 0 else "₱%.2f"|format(shipping_cost|default(0)) }}</span>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-4">
+                        <strong>Total</strong>
+                        <strong>₱{{ "%.2f"|format(total + shipping_cost|default(0)) }}</strong>
+                    </div>
+                    
+                    <div class="alert alert-info small">
+                        <i class="fas fa-info-circle me-2"></i>
+                        This amount will be processed in PHP with PayPal.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Accepted Payment -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">We Accept</h5>
+                    <div class="d-flex justify-content-center gap-3">
+                        <i class="fab fa-cc-paypal fa-3x text-dark"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form for storing session information -->
+<form id="session-data" style="display:none;">
+    <input type="hidden" name="user_id" value="{{ current_user.id }}">
+    <input type="hidden" name="address_id" value="{{ session.get('checkout_address_id', '') }}">
+    <input type="hidden" name="timestamp" value="{{ now }}">
+</form>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // Store the selected shipping address in the session
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the address ID from the PayPal form custom field
+        const addressId = "{{ session.get('checkout_address_id', '') }}";
+        if (!addressId) {
+            console.warn("No address ID found in session. You may need to select a shipping address.");
+        }
+        
+        // Store timestamp in localStorage to help with order tracking
+        localStorage.setItem('kickx_last_checkout', new Date().toISOString());
+        localStorage.setItem('kickx_checkout_user', "{{ current_user.id }}");
+    });
+</script>
+{% endblock %} 

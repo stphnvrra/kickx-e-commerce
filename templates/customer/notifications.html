@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Settings - Kickx{% endblock %}
+
+{% block content %}
+<div class="notifications-container">
+    <div class="notifications-header">
+        <h1>Notification Settings</h1>
+        <p>Manage how you want to be notified about your orders, promotions, and updates.</p>
+    </div>
+
+    <div class="notifications-content">
+        <form method="POST" class="notifications-form">
+            
+            <div class="notification-section">
+                <h2>Email Notifications</h2>
+                <div class="notification-options">
+                    <div class="notification-option">
+                        <div class="option-info">
+                            <h3>Order Updates</h3>
+                            <p>Receive updates about your order status, shipping, and delivery.</p>
+                        </div>
+                        <div class="option-toggle">
+                            {{ form.email_order_updates(class="toggle-input") }}
+                            <label for="email_order_updates" class="toggle-label"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <div class="option-info">
+                            <h3>Promotions & Discounts</h3>
+                            <p>Get notified about special offers, discounts, and promotions.</p>
+                        </div>
+                        <div class="option-toggle">
+                            {{ form.email_promotions(class="toggle-input") }}
+                            <label for="email_promotions" class="toggle-label"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <div class="option-info">
+                            <h3>New Arrivals</h3>
+                            <p>Be the first to know about new product arrivals and restocks.</p>
+                        </div>
+                        <div class="option-toggle">
+                            {{ form.email_new_arrivals(class="toggle-input") }}
+                            <label for="email_new_arrivals" class="toggle-label"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <div class="option-info">
+                            <h3>Wishlist Alerts</h3>
+                            <p>Get notified when items in your wishlist go on sale or come back in stock.</p>
+                        </div>
+                        <div class="option-toggle">
+                            {{ form.email_wishlist_alerts(class="toggle-input") }}
+                            <label for="email_wishlist_alerts" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="notification-section">
+                <h2>SMS Notifications</h2>
+                <div class="notification-options">
+                    <div class="notification-option">
+                        <div class="option-info">
+                            <h3>Order Updates</h3>
+                            <p>Receive text messages about your order status, shipping, and delivery.</p>
+                        </div>
+                        <div class="option-toggle">
+                            {{ form.sms_order_updates(class="toggle-input") }}
+                            <label for="sms_order_updates" class="toggle-label"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <div class="option-info">
+                            <h3>Promotions & Discounts</h3>
+                            <p>Get text messages about special offers, discounts, and promotions.</p>
+                        </div>
+                        <div class="option-toggle">
+                            {{ form.sms_promotions(class="toggle-input") }}
+                            <label for="sms_promotions" class="toggle-label"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-option">
+                        <div class="option-info">
+                            <h3>Delivery Alerts</h3>
+                            <p>Receive text messages when your package is out for delivery.</p>
+                        </div>
+                        <div class="option-toggle">
+                            {{ form.sms_delivery_alerts(class="toggle-input") }}
+                            <label for="sms_delivery_alerts" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="notification-section">
+                <h2>Push Notifications</h2>
+                <div class="notification-options">
+                    <div class="notification-option">
+                        <div class="option-info">
+                            <h3>Enable Push Notifications</h3>
+                            <p>Receive push notifications on your device about orders, promotions, and updates.</p>
+                        </div>
+                        <div class="option-toggle">
+                            {{ form.push_notifications(class="toggle-input") }}
+                            <label for="push_notifications" class="toggle-label"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="push-notification-info">
+                    <p><i class="fas fa-info-circle"></i> Push notifications are only available when you're using our mobile app.</p>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Preferences</button>
+                <a href="{{ url_for('customer.profile') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.notifications-container {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.notifications-header {
+    margin-bottom: 2rem;
+}
+
+.notifications-header h1 {
+    margin-bottom: 0.5rem;
+}
+
+.notifications-header p {
+    color: #6c757d;
+}
+
+.notifications-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.notification-section {
+    padding: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.notification-section:last-child {
+    border-bottom: none;
+}
+
+.notification-section h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+}
+
+.notification-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.notification-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.option-info {
+    flex: 1;
+}
+
+.option-info h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+}
+
+.option-info p {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.option-toggle {
+    position: relative;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.toggle-label:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-input:checked + .toggle-label {
+    background-color: #007bff;
+}
+
+.toggle-input:checked + .toggle-label:before {
+    transform: translateX(26px);
+}
+
+.push-notification-info {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.push-notification-info i {
+    margin-right: 0.5rem;
+    color: #007bff;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #545b62;
+}
+
+@media (max-width: 576px) {
+    .notification-option {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .option-toggle {
+        align-self: flex-end;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %} 

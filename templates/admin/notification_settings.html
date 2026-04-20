@@ -1,0 +1,182 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Notification System Settings{% endblock %}
+
+{% block header_title %}Notification System Settings{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Notification Settings</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Notification System Settings</h2>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="card-icon me-3" style="background-color: #fd7e14;">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h5 class="card-title mb-0">Notification Configuration</h5>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" action="{{ url_for('update_notification_settings') }}">
+                        
+                        <h5 class="mb-3">Notification Types</h5>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" id="new_arrival_notifications" name="new_arrival_notifications" type="checkbox" {% if settings.new_arrival_notifications %}checked{% endif %} />
+                            <label class="form-check-label" for="new_arrival_notifications">New Arrivals</label>
+                        </div>
+                        <div class="form-text mb-3">Notify users about newly added sneakers</div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" id="restock_notifications" name="restock_notifications" type="checkbox" {% if settings.restock_notifications %}checked{% endif %} />
+                            <label class="form-check-label" for="restock_notifications">Restocks</label>
+                        </div>
+                        <div class="form-text mb-3">Notify users when previously out-of-stock items are back in stock</div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" id="price_drop_notifications" name="price_drop_notifications" type="checkbox" {% if settings.price_drop_notifications %}checked{% endif %} />
+                            <label class="form-check-label" for="price_drop_notifications">Price Drops</label>
+                        </div>
+                        <div class="form-text mb-3">Notify users when items on their wishlist have a price reduction</div>
+                        
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" id="exclusive_drop_notifications" name="exclusive_drop_notifications" type="checkbox" {% if settings.exclusive_drop_notifications %}checked{% endif %} />
+                            <label class="form-check-label" for="exclusive_drop_notifications">Exclusive Drops</label>
+                        </div>
+                        <div class="form-text mb-3">Send special notifications for limited-edition releases</div>
+                        
+                        <h5 class="mt-4 mb-3">Configuration</h5>
+                        
+                        <div class="form-floating mb-3">
+                            <input class="form-control" id="notification_cooldown_hours" name="notification_cooldown_hours" type="number" min="1" max="168" value="{{ settings.notification_cooldown_hours }}" required />
+                            <label for="notification_cooldown_hours">Notification Cooldown (hours)</label>
+                        </div>
+                        <div class="form-text mb-3">Minimum time between notifications to the same user</div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Settings
+                            </button>
+                            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Card styling */
+.card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+/* Form styling */
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+.form-check-input {
+    width: 2.5em;
+    height: 1.25em;
+    margin-top: 0.25em;
+    vertical-align: top;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+    transition: background-color 0.15s ease-in-out, background-position 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: -0.5rem;
+}
+
+/* Button styling */
+.btn {
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    box-shadow: 0 2px 5px rgba(var(--primary-rgb), 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn i {
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %} 

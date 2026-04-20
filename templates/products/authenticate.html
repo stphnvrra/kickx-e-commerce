@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Product Authentication - {{ product.name }} | Kickx{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('main.index') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('products.list') }}">Products</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('products.detail', slug=product.slug) }}">{{ product.name }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Authentication</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white">
+                    <h2 class="h4 mb-0">Product Authentication</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="{{ product.image_url }}" alt="{{ product.name }}" class="img-fluid rounded mb-3">
+                            <h3 class="h5">{{ product.name }}</h3>
+                            <p class="mb-1"><strong>Brand:</strong> {{ product.brand.name if product.brand else 'Unknown' }}</p>
+                            <p class="mb-1"><strong>Style Code:</strong> {{ product.style_code or 'N/A' }}</p>
+                            <p class="mb-1"><strong>Price:</strong> ${{ product.price }}</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="authentication-result mb-4">
+                                {% if authentication_data.verified %}
+                                <div class="alert alert-success">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-check-circle fa-3x me-3"></i>
+                                        <div>
+                                            <h4 class="alert-heading">Verified Authentic</h4>
+                                            <p class="mb-0">This product has been verified as authentic by the Kickx authentication team.</p>
+                                            <small>Verified on {{ authentication_data.verification_date.strftime('%B %d, %Y') }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="alert alert-danger">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-exclamation-triangle fa-3x me-3"></i>
+                                        <div>
+                                            <h4 class="alert-heading">Authentication Failed</h4>
+                                            <p class="mb-0">We could not verify this product as authentic. Please contact customer support for assistance.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="authentication-details">
+                                <h4>Authentication Process</h4>
+                                <p>At Kickx, we employ a rigorous multi-step authentication process to ensure every product we sell is 100% authentic.</p>
+                                
+                                <div class="row mt-4">
+                                    {% for feature in authentication_data.authentication_features %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="feature-icon me-3">
+                                                <i class="fas fa-shield-alt text-primary"></i>
+                                            </div>
+                                            <div class="feature-text">
+                                                <p class="mb-0">{{ feature }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="mt-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Authentication Certificate</h5>
+                                            <p>This digital certificate verifies that this product has passed all authenticity checks.</p>
+                                            <div class="certificate-qr text-center my-3">
+                                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://kickx.com/verify/{{ authentication_data.product_id }}" alt="Authentication QR Code">
+                                            </div>
+                                            <div class="text-center">
+                                                <small class="text-muted">Certificate ID: KX-{{ authentication_data.product_id }}-{{ authentication_data.verification_date.strftime('%Y%m%d') }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white text-center">
+                    <a href="{{ url_for('products.detail', slug=product.slug) }}" class="btn btn-primary">Return to Product</a>
+                    <a href="#" class="btn btn-outline-secondary ms-2">Download Certificate</a>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h3 class="h5 mb-0">Our Authentication Guarantee</h3>
+                </div>
+                <div class="card-body">
+                    <p>At Kickx, we stand behind the authenticity of every product we sell. Our expert authenticators meticulously inspect each item for quality and authenticity before it reaches you.</p>
+                    <p>If you ever have questions about a product's authenticity, please <a href="{{ url_for('main.contact') }}">contact our support team</a> for assistance.</p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-medal fa-3x text-primary mb-3"></i>
+                            <h5>Expert Verification</h5>
+                            <p class="small">Every item is inspected by trained authenticators with extensive knowledge of sneakers.</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-thumbs-up fa-3x text-primary mb-3"></i>
+                            <h5>100% Authentic</h5>
+                            <p class="small">We guarantee that all products sold on Kickx are 100% authentic or your money back.</p>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+                            <h5>Secure Verification</h5>
+                            <p class="small">Our authentication tags use secure technology that cannot be replicated or tampered with.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

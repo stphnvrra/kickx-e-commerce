@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications - Kickx{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-bell me-3 header-icon text-primary" style="font-size: 1.8rem;"></i>
+            <div>
+                <h1 class="mb-1">Notifications</h1>
+                <p class="text-muted mb-0">Stay updated with the latest news and offers</p>
+            </div>
+                        </div>
+        <div class="profile-nav-buttons d-flex">
+            <a href="{{ url_for('profile_dashboard') }}" class="btn btn-outline-primary me-2">
+                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+            {% if notifications and notifications.items and notifications.items|length > 0 %}
+            <a href="{{ url_for('mark_all_notifications_read') }}" class="btn btn-primary">
+                <i class="fas fa-check-double me-2"></i> Mark All as Read
+            </a>
+            {% endif %}
+                        </div>
+                    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body p-4">
+                    {% if notifications and notifications.items and notifications.items|length > 0 %}
+                        <div class="list-group notification-list">
+                            {% for notification in notifications.items %}
+                                <div class="list-group-item notification-item {% if not notification.is_read %}unread{% endif %} border-0 mb-2">
+                                    <div class="d-flex">
+                                        {% if notification.type == 'new_arrival' %}
+                                        <div class="notification-icon bg-primary text-white"><i class="fas fa-tshirt"></i></div>
+                                        {% elif notification.type == 'sale' %}
+                                        <div class="notification-icon bg-success text-white"><i class="fas fa-tag"></i></div>
+                                        {% elif notification.type == 'exclusive' %}
+                                        <div class="notification-icon bg-warning text-white"><i class="fas fa-star"></i></div>
+                                        {% else %}
+                                        <div class="notification-icon bg-info text-white"><i class="fas fa-bell"></i></div>
+                                        {% endif %}
+                                        
+                                        <div class="ms-3 flex-grow-1">
+                                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                                <h6 class="mb-0 fw-bold">{{ notification.type|capitalize }} Notification</h6>
+                                                <small class="text-muted">{{ notification.created_at|time_ago }}</small>
+                        </div>
+                                            <p class="mb-1">{{ notification.message }}</p>
+                                            <div class="d-flex justify-content-end mt-2">
+                                                {% if notification.link %}
+                                                <a href="{{ notification.link }}" class="btn btn-sm btn-outline-primary me-2">
+                                                    <i class="fas fa-external-link-alt me-1"></i> View Details
+                                                </a>
+                                                {% endif %}
+                                                {% if not notification.is_read %}
+                                                <a href="{{ url_for('mark_notification_read', notification_id=notification.id) }}" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-check me-1"></i> Mark as Read
+                                                </a>
+                                                {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Pagination -->
+                        {% if notifications.pages > 1 %}
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if notifications.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('view_all_notifications', page=notifications.prev_num) }}">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                                </li>
+                                {% endif %}
+                                
+                                {% for page_num in notifications.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                                    {% if page_num %}
+                                        {% if notifications.page == page_num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                        {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('view_all_notifications', page=page_num) }}">
+                                                {{ page_num }}
+                                            </a>
+                                        </li>
+                                        {% endif %}
+                                    {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if notifications.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('view_all_notifications', page=notifications.next_num) }}">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-bell-slash mb-3" style="font-size: 3rem; color: #ddd;"></i>
+                            <h4 class="mb-3">No Notifications Yet</h4>
+                            <p class="text-muted mb-4">You don't have any notifications at the moment.</p>
+                            <a href="{{ url_for('product_catalog') }}" class="btn btn-primary">
+                                <i class="fas fa-shopping-bag me-2"></i> Browse Products
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .notification-list .notification-item {
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        position: relative;
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+    
+    .notification-list .notification-item:hover {
+        background-color: rgba(236, 82, 40, 0.05);
+    }
+    
+    .notification-list .notification-item.unread {
+        background-color: rgba(236, 82, 40, 0.08);
+    }
+    
+    .notification-list .notification-item.unread:before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--primary-color);
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+    
+    .header-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+    }
+</style>
+{% endblock %} 

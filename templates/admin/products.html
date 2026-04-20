@@ -1,0 +1,614 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Products - Kickx Admin{% endblock %}
+
+{% block header_title %}Product Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Products</li>
+        </ol>
+    </nav>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-box me-2"></i> Product Management
+            </h5>
+            <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i> Add Product
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center g-3">
+                <div class="col-md-5">
+                    <div class="search-section">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="form-control search-input" placeholder="Search products..." id="product-search">
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="d-flex gap-3 flex-wrap justify-content-md-end">
+                        <select class="form-select" id="brand-filter">
+                            <option value="">All Brands</option>
+                            <option value="1">Nike</option>
+                            <option value="2">Adidas</option>
+                            <option value="3">Jordan</option>
+                            <option value="4">New Balance</option>
+                            <option value="5">Puma</option>
+                            <option value="6">Under Armour</option>
+                            <option value="7">Reebok</option>
+                            <option value="8">Converse</option>
+                            <option value="9">Vans</option>
+                        </select>
+                        
+                        <select class="form-select" id="category-filter">
+                            <option value="">All Categories</option>
+                            <option value="1">Basketball</option>
+                            <option value="2">Running</option>
+                            <option value="3">Lifestyle</option>
+                            <option value="4">Training</option>
+                            <option value="5">Soccer</option>
+                            <option value="6">Tennis</option>
+                            <option value="7">Skateboarding</option>
+                            <option value="8">Walking</option>
+                        </select>
+                        
+                        <select class="form-select" id="status-filter">
+                            <option value="">All Status</option>
+                            <option value="in_stock">In Stock</option>
+                            <option value="low_stock">Low Stock</option>
+                            <option value="out_of_stock">Out of Stock</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list me-2"></i> Products List
+            </h5>
+            <span class="badge bg-primary">{{ products.total }} product{% if products.total != 1 %}s{% endif %}</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Product</th>
+                            <th>Style Code</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in products.items %}
+                        <tr class="product-row" data-brand-id="{{ product.brand_id }}" data-category-id="{{ product.category_id }}">
+                            <td>
+                                <div class="product-image-cell" style="background-image: url('{{ product.image_url }}')"></div>
+                            </td>
+                            <td>
+                                <div class="product-title">{{ product.name }}</div>
+                                <div class="product-brand">
+                                    {% if product.brand_id == 1 %}
+                                        Nike
+                                    {% elif product.brand_id == 2 %}
+                                        Adidas
+                                    {% elif product.brand_id == 3 %}
+                                        Jordan
+                                    {% elif product.brand_id == 4 %}
+                                        New Balance
+                                    {% elif product.brand_id == 5 %}
+                                        Puma
+                                    {% elif product.brand_id == 6 %}
+                                        Under Armour
+                                    {% elif product.brand_id == 7 %}
+                                        Reebok
+                                    {% elif product.brand_id == 8 %}
+                                        Converse
+                                    {% elif product.brand_id == 9 %}
+                                        Vans
+                                    {% else %}
+                                        No Brand
+                                    {% endif %} • 
+                                    {% if product.category_id == 1 %}
+                                        Basketball
+                                    {% elif product.category_id == 2 %}
+                                        Running
+                                    {% elif product.category_id == 3 %}
+                                        Lifestyle
+                                    {% elif product.category_id == 4 %}
+                                        Training
+                                    {% elif product.category_id == 5 %}
+                                        Soccer
+                                    {% elif product.category_id == 6 %}
+                                        Tennis
+                                    {% elif product.category_id == 7 %}
+                                        Skateboarding
+                                    {% elif product.category_id == 8 %}
+                                        Walking
+                                    {% else %}
+                                        No Category
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>{{ product.style_code if product.style_code else 'N/A' }}</td>
+                            <td>
+                                {% if product.discount_price %}
+                                <div class="strikethrough mb-1">₱{{ product.price }}</div>
+                                <div class="fw-bold">₱{{ product.discount_price }}</div>
+                                {% else %}
+                                <div class="fw-bold">₱{{ product.price }}</div>
+                                {% endif %}
+                            </td>
+                            <td>{{ product.stock }}</td>
+                            <td>
+                                {% if product.stock <= 5 and product.stock > 0 %}
+                                <span class="status-badge status-low-stock">
+                                    <i class="fas fa-exclamation-triangle me-1"></i> Low Stock
+                                </span>
+                                {% elif product.stock == 0 %}
+                                <span class="status-badge status-cancelled">
+                                    <i class="fas fa-times-circle me-1"></i> Out of Stock
+                                </span>
+                                {% else %}
+                                <span class="status-badge status-delivered">
+                                    <i class="fas fa-check-circle me-1"></i> In Stock
+                                </span>
+                                {% endif %}
+                                
+                                {% if product.is_new %}
+                                <span class="status-badge status-processing mt-1">
+                                    <i class="fas fa-tag me-1"></i> New
+                                </span>
+                                {% endif %}
+                                
+                                {% if product.featured %}
+                                <span class="status-badge status-shipped mt-1">
+                                    <i class="fas fa-star me-1"></i> Featured
+                                </span>
+                                {% endif %}
+                                
+                                {% if product.discount_price %}
+                                <span class="status-badge status-pending mt-1">
+                                    <i class="fas fa-fire me-1"></i> Sale
+                                </span>
+                                {% endif %}
+                                
+                                {% if product.is_verified %}
+                                <span class="status-badge status-authenticated mt-1">
+                                    <i class="fas fa-check-circle me-1"></i> Verified
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="{{ url_for('admin_edit_product', product_id=product.id) }}" class="btn btn-sm btn-outline-primary action-btn" data-bs-toggle="tooltip" title="Edit">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-sm btn-outline-success action-btn" data-bs-toggle="tooltip" title="View" target="_blank">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary action-btn" data-bs-toggle="modal" data-bs-target="#authenticateModal{{ product.id }}" title="Authenticate">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger action-btn" data-bs-toggle="modal" data-bs-target="#deleteModal{{ product.id }}" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pagination -->
+    {% if products.pages > 1 %}
+    <div class="card-footer">
+        <nav aria-label="Product pagination">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item {% if not products.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin_products', page=products.prev_num) if products.has_prev else '#' }}" aria-label="Previous">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+                
+                {% for page_num in products.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == products.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('admin_products', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">…</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                <li class="page-item {% if not products.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('admin_products', page=products.next_num) if products.has_next else '#' }}" aria-label="Next">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+{% for product in products.items %}
+<!-- Authentication Modal -->
+<div class="modal fade" id="authenticateModal{{ product.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-shield-alt me-2 text-primary"></i>
+                    Authentication Process
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('admin_authenticate_product', product_id=product.id) }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control" value="{{ product.name }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Authentication Status</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="is_verified" id="is_verified{{ product.id }}" {% if product.is_verified %}checked{% endif %}>
+                            <label class="form-check-label" for="is_verified{{ product.id }}">
+                                Mark as Verified Authentic
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Authenticator</label>
+                        <select class="form-select" name="authenticator">
+                            <option value="internal">Internal Team</option>
+                            <option value="check_check">Check Check</option>
+                            <option value="legit_grails">Legit Grails</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes</label>
+                        <textarea class="form-control" rows="3" name="auth_notes"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Update Authentication
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal{{ product.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
+                    Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>{{ product.name }}</strong>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <form action="{{ url_for('admin_delete_product', product_id=product.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i> Delete Product
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block styles %}
+<style>
+    /* Search */
+    .search-section {
+        position: relative;
+    }
+        
+    .search-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        opacity: 0.7;
+    }
+
+    .search-input {
+        padding-left: 48px;
+        height: 48px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.15);
+        border-color: var(--primary-color);
+    }
+
+    .form-select {
+        height: 48px;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        padding-left: 16px;
+        background-position: right 16px center;
+        transition: all 0.3s ease;
+    }
+
+    .form-select:focus {
+        box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.15);
+        border-color: var(--primary-color);
+    }
+
+    /* Product image */
+    .product-image-cell {
+        width: 64px;
+        height: 64px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 10px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+    .product-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+
+    .product-brand {
+        color: #6c757d;
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+    }
+
+    .product-brand::before {
+        content: "";
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        margin-right: 6px;
+        opacity: 0.7;
+    }
+
+    .strikethrough {
+        text-decoration: line-through;
+        color: #9ca3af;
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: capitalize;
+        display: inline-block;
+    }
+
+    .status-badge.status-pending {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+    }
+
+    .status-badge.status-processing {
+        background-color: rgba(13, 110, 253, 0.15);
+        color: #0d6efd;
+    }
+
+    .status-badge.status-shipped {
+        background-color: rgba(23, 162, 184, 0.15);
+        color: #17a2b8;
+    }
+
+    .status-badge.status-delivered {
+        background-color: rgba(25, 135, 84, 0.15);
+        color: #198754;
+    }
+
+    .status-badge.status-cancelled {
+        background-color: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+    }
+
+    .status-badge.status-low-stock {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+    }
+    
+    .status-badge.status-authenticated {
+        background-color: rgba(25, 135, 84, 0.15);
+        color: #198754;
+    }
+    
+    /* Action Buttons */
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+    }
+    
+    .action-btn i {
+        font-size: 0.9rem;
+    }
+    
+    .btn-outline-primary:hover, 
+    .btn-outline-success:hover,
+    .btn-outline-secondary:hover,
+    .btn-outline-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Pagination */
+    .pagination {
+        margin: 1rem 0;
+    }
+
+    .page-link {
+        border-radius: 8px;
+        margin: 0 4px;
+        min-width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #4b5563;
+        border: 1px solid #e5e7eb;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+        background-color: #f9fafb;
+        color: var(--primary-color);
+        border-color: #d1d5db;
+        z-index: 2;
+    }
+
+    .page-item.active .page-link {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        box-shadow: 0 3px 6px rgba(var(--bs-primary-rgb), 0.2);
+        font-weight: 600;
+    }
+
+    .page-item.disabled .page-link {
+        color: #9ca3af;
+        background-color: #f3f4f6;
+        border-color: #e5e7eb;
+    }
+
+    /* Modal styles */
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        if (tooltipTriggerList.length > 0) {
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    delay: { show: 500, hide: 100 }
+                });
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('product-search');
+        const brandFilter = document.getElementById('brand-filter');
+        const categoryFilter = document.getElementById('category-filter');
+        const statusFilter = document.getElementById('status-filter');
+        
+        function filterProducts() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const brandValue = brandFilter.value;
+            const categoryValue = categoryFilter.value;
+            const statusValue = statusFilter.value.toLowerCase();
+            
+            const productRows = document.querySelectorAll('.product-row');
+            
+            productRows.forEach(row => {
+                const productTitle = row.querySelector('.product-title').textContent.toLowerCase();
+                const productBrand = row.querySelector('.product-brand').textContent.toLowerCase();
+                const productStyleCode = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                const productStatus = Array.from(row.querySelectorAll('.status-badge')).map(b => b.textContent.toLowerCase());
+                
+                // Combine all filters
+                const matchesSearch = productTitle.includes(searchTerm) || 
+                                     productBrand.includes(searchTerm) || 
+                                     productStyleCode.includes(searchTerm);
+                
+                const matchesBrand = brandValue === '' || row.dataset.brandId === brandValue;
+                const matchesCategory = categoryValue === '' || row.dataset.categoryId === categoryValue;
+                
+                const matchesStatus = statusValue === '' || 
+                    (statusValue === 'in_stock' && productStatus.some(s => s.includes('in stock'))) ||
+                    (statusValue === 'low_stock' && productStatus.some(s => s.includes('low stock'))) ||
+                    (statusValue === 'out_of_stock' && productStatus.some(s => s.includes('out of stock')));
+                
+                if (matchesSearch && matchesBrand && matchesCategory && matchesStatus) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+        
+        // Add event listeners to all filters
+        if (searchInput) searchInput.addEventListener('input', filterProducts);
+        if (brandFilter) brandFilter.addEventListener('change', filterProducts);
+        if (categoryFilter) categoryFilter.addEventListener('change', filterProducts);
+        if (statusFilter) statusFilter.addEventListener('change', filterProducts);
+        
+        // Clear search box with escape key
+        if (searchInput) {
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    searchInput.value = '';
+                    filterProducts();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %} 

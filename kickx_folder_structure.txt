@@ -1,0 +1,103 @@
+KickX Flask E-commerce Application Structure
+├── kickx_app.py                    # Main application entry point
+├── config.py                       # Configuration settings
+├── requirements.txt                # Python dependencies
+├── README.md                       # Project documentation
+├── .gitignore                      # Git ignore file
+├── instance/                       # Instance-specific data
+│   └── config.py                   # Instance-specific configuration
+├── migrations/                     # Database migrations (Alembic)
+│   └── versions/                   # Migration versions
+├── static/                         # Static assets
+│   ├── css/                        # Stylesheets
+│   │   ├── main.css                # Main stylesheet
+│   │   └── bootstrap.min.css       # Bootstrap CSS
+│   ├── js/                         # JavaScript files
+│   │   ├── main.js                 # Main JavaScript
+│   │   └── bootstrap.min.js        # Bootstrap JS
+│   ├── images/                     # Image assets
+│   │   ├── logo.png                # Site logo
+│   │   ├── products/               # Product images
+│   │   ├── banners/                # Banner images
+│   │   └── placeholder.jpg         # Placeholder image
+│   └── fonts/                      # Font files
+├── templates/                      # HTML templates
+│   ├── base.html                   # Base template with common elements
+│   ├── index.html                  # Homepage template
+│   ├── auth/                       # Authentication templates
+│   │   ├── login.html              # Login page
+│   │   ├── register.html           # Registration page
+│   │   └── reset_password.html     # Password reset page
+│   ├── products/                   # Product templates
+│   │   ├── catalog.html            # Product catalog
+│   │   ├── detail.html             # Product detail page
+│   │   └── _recommendation_explanation.html # Partial for recommendations
+│   ├── cart/                       # Shopping cart templates
+│   │   ├── cart.html               # Cart page
+│   │   └── _cart_item.html         # Cart item partial
+│   ├── checkout/                   # Checkout templates
+│   │   ├── address.html            # Address entry page
+│   │   ├── payment.html            # Payment page
+│   │   ├── review.html             # Order review page
+│   │   └── confirmation.html       # Order confirmation
+│   ├── profile/                    # User profile templates
+│   │   ├── dashboard.html          # User dashboard
+│   │   ├── orders.html             # Order history
+│   │   ├── addresses.html          # Saved addresses
+│   │   └── wishlist.html           # Wishlist page
+│   ├── admin/                      # Admin templates
+│   │   ├── dashboard.html          # Admin dashboard
+│   │   ├── products.html           # Product management
+│   │   ├── orders.html             # Order management
+│   │   └── users.html              # User management
+│   └── errors/                     # Error templates
+│       ├── 404.html                # Not found error
+│       └── 500.html                # Server error
+├── models/                         # Database models
+│   ├── __init__.py                 # Package initialization
+│   ├── user.py                     # User model
+│   ├── product.py                  # Product model
+│   ├── order.py                    # Order model
+│   ├── review.py                   # Review model
+│   └── address.py                  # Address model
+├── routes/                         # Application routes
+│   ├── __init__.py                 # Package initialization
+│   ├── auth.py                     # Authentication routes
+│   ├── main.py                     # Main/home routes
+│   ├── product.py                  # Product routes
+│   ├── cart.py                     # Cart routes
+│   ├── checkout.py                 # Checkout routes
+│   ├── profile.py                  # User profile routes
+│   └── admin.py                    # Admin routes
+├── services/                       # Business logic services
+│   ├── __init__.py                 # Package initialization
+│   ├── auth_service.py             # Authentication services
+│   ├── product_service.py          # Product services
+│   ├── order_service.py            # Order services
+│   ├── cart_service.py             # Cart services
+│   ├── payment_service.py          # Payment processing services
+│   ├── paypal_service.py           # PayPal integration services
+│   └── user_service.py             # User management services
+├── forms/                          # WTForms
+│   ├── __init__.py                 # Package initialization
+│   ├── auth_forms.py               # Authentication forms
+│   ├── product_forms.py            # Product forms
+│   ├── checkout_forms.py           # Checkout forms
+│   └── user_forms.py               # User profile forms
+├── utils/                          # Utility functions
+│   ├── __init__.py                 # Package initialization
+│   ├── helpers.py                  # Helper functions
+│   ├── email.py                    # Email utilities
+│   ├── validators.py               # Custom validators
+│   └── decorators.py               # Custom decorators
+└── tests/                          # Unit and integration tests
+    ├── __init__.py                 # Package initialization
+    ├── test_models.py              # Model tests
+    ├── test_routes.py              # Route tests
+    ├── test_forms.py               # Form tests
+    └── test_services.py            # Service tests
+
+# Configuration Files
+├── paypal_config.py                # PayPal specific configuration
+├── .env                            # Environment variables (not in git)
+└── docker-compose.yml              # Docker compose setup 

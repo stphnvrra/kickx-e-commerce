@@ -1,0 +1,627 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}View User - {{ user.first_name }} {{ user.last_name }} - Kickx{% endblock %}
+
+{% block content %}
+<div class="admin-content container-fluid mx-auto" style="max-width: 1200px;">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">User Profile</h2>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Users
+            </a>
+            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#statusModal">
+                <i class="fas fa-power-off me-1"></i> {{ 'Deactivate' if user.is_active else 'Activate' }} User
+            </button>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="fas fa-trash me-1"></i> Delete User
+            </button>
+        </div>
+    </div>
+
+    <!-- User Information Card -->
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <div class="d-flex align-items-center">
+                <div class="card-icon users-icon me-3">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h5 class="card-title mb-0">{% if user %}User Information: {{ user.first_name }} {{ user.last_name }}{% else %}User Information{% endif %}</h5>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">User ID</label>
+                        <p class="fw-bold">#{{ user.id }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Name</label>
+                        <p class="fw-bold">{{ user.first_name }} {{ user.last_name }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Email</label>
+                        <p class="fw-bold">{{ user.email }}</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Role</label>
+                        <p>
+                            {% if user.is_admin %}
+                            <span class="status-badge status-processing">
+                                <i class="fas fa-user-shield me-1"></i> Admin
+                            </span>
+                            {% else %}
+                            <span class="status-badge status-shipped">
+                                <i class="fas fa-user me-1"></i> User
+                            </span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Status</label>
+                        <p>
+                            {% if user.is_active %}
+                            <span class="status-badge status-delivered">
+                                <i class="fas fa-check-circle me-1"></i> Active
+                            </span>
+                            {% else %}
+                            <span class="status-badge status-cancelled">
+                                <i class="fas fa-times-circle me-1"></i> Inactive
+                            </span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted small">Joined Date</label>
+                        <p class="fw-bold">{{ user.created_at.strftime('%B %d, %Y') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Filter Card -->
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+            <div class="row align-items-center g-3">
+                <div class="col-md-5">
+                    <div class="search-section">
+                        <input type="text" class="form-control search-input" placeholder="Search orders..." id="order-search">
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="d-flex gap-3 flex-wrap justify-content-md-end">
+                        <select class="form-select" id="status-filter">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        
+                        <select class="form-select" id="date-filter">
+                            <option value="">All Time</option>
+                            <option value="last_week">Last Week</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="last_3_months">Last 3 Months</option>
+                            <option value="last_year">Last Year</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Orders -->
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <div class="card-icon orders-icon me-3">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <h5 class="card-title mb-0">Order History</h5>
+                </div>
+                <span class="badge bg-primary rounded-pill mx-3">{{ orders|length }} Orders</span>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover admin-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="order-rows">
+                        {% for order in orders %}
+                        <tr class="order-row">
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.created_at.strftime('%b %d, %Y') }}</td>
+                            <td class="fw-bold">₱{{ "%.2f"|format(order.total_amount) }}</td>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                <span class="status-badge status-pending">
+                                    <i class="fas fa-clock me-1"></i> {{ order.status }}
+                                </span>
+                                {% elif order.status == 'processing' %}
+                                <span class="status-badge status-processing">
+                                    <i class="fas fa-cog me-1"></i> {{ order.status }}
+                                </span>
+                                {% elif order.status == 'shipped' %}
+                                <span class="status-badge status-shipped">
+                                    <i class="fas fa-truck me-1"></i> {{ order.status }}
+                                </span>
+                                {% elif order.status == 'delivered' %}
+                                <span class="status-badge status-delivered">
+                                    <i class="fas fa-check-circle me-1"></i> {{ order.status }}
+                                </span>
+                                {% elif order.status == 'cancelled' %}
+                                <span class="status-badge status-cancelled">
+                                    <i class="fas fa-times-circle me-1"></i> {{ order.status }}
+                                </span>
+                                {% else %}
+                                <span class="status-badge">{{ order.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end">
+                                    <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View Order">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <div class="empty-state">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <p>No orders found for this user</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if orders and orders|length > 10 %}
+    <nav aria-label="Order pagination">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    {% endif %}
+
+    <!-- Toggle Status Modal -->
+    <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-power-off me-2 text-warning"></i>
+                        Change User Status
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to change the status of <strong>{{ user.first_name }} {{ user.last_name }}</strong> from <strong>{{ 'Active' if user.is_active else 'Inactive' }}</strong> to <strong>{{ 'Inactive' if user.is_active else 'Active' }}</strong>?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <form action="{{ url_for('admin_edit_user', user_id=user.id) }}" method="POST">
+                        <input type="hidden" name="is_active" value="{{ 0 if user.is_active else 1 }}">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-power-off me-1"></i> Change Status
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
+                        Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong>{{ user.first_name }} {{ user.last_name }}</strong>?</p>
+                    <p class="text-danger">This action cannot be undone and will remove all user data.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <form action="{{ url_for('admin_edit_user', user_id=user.id) }}" method="POST">
+                        <input type="hidden" name="delete" value="1">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> Delete User
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Dashboard Cards */
+.dashboard-card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.users-icon {
+    background-color: #6f42c1;
+}
+
+.orders-icon {
+    background-color: #0d6efd;
+}
+
+/* Search */
+.search-section {
+    position: relative;
+}
+    
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    opacity: 0.7;
+}
+
+.search-input {
+    padding-left: 16px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+.form-select {
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    padding-left: 16px;
+    background-position: right 16px center;
+    transition: all 0.3s ease;
+}
+
+.form-select:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.status-badge.status-pending {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+.status-badge.status-processing {
+    background-color: rgba(13, 110, 253, 0.15);
+    color: #0d6efd;
+}
+
+.status-badge.status-shipped {
+    background-color: rgba(25, 135, 84, 0.15);
+    color: #198754;
+}
+
+.status-badge.status-delivered {
+    background-color: rgba(25, 135, 84, 0.15);
+    color: #198754;
+}
+
+.status-badge.status-cancelled {
+    background-color: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+/* Admin Table */
+.admin-table th {
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 1rem;
+}
+
+.admin-table td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.admin-table tr:hover {
+    background-color: rgba(236, 82, 40, 0.05);
+}
+
+/* Empty state */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+
+/* Pagination */
+.pagination {
+    margin-top: 2rem;
+}
+
+.page-link {
+    border-radius: 10px;
+    margin: 0 4px;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    background-color: #f9fafb;
+    color: var(--primary-color);
+    border-color: #d1d5db;
+    z-index: 2;
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 3px 6px rgba(var(--primary-rgb), 0.2);
+    font-weight: 600;
+}
+
+.page-item.disabled .page-link {
+    color: #9ca3af;
+    background-color: #f3f4f6;
+    border-color: #e5e7eb;
+}
+
+/* Button styles */
+.btn {
+    font-weight: 500;
+    border-radius: 10px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    box-shadow: 0 2px 5px rgba(var(--primary-rgb), 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn i {
+    font-size: 0.9rem;
+}
+
+/* Small buttons for actions */
+.btn-sm {
+    padding: 0.375rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+
+.btn-outline-primary:hover, 
+.btn-outline-success:hover,
+.btn-outline-secondary:hover,
+.btn-outline-danger:hover {
+    transform: translateY(-2px);
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 20px 24px;
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 16px 24px;
+}
+
+.modal-title {
+    font-weight: 600;
+    color: #111827;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .btn-sm {
+        padding: 0.25rem 0.4rem;
+    }
+    
+    .admin-table th, 
+    .admin-table td {
+        padding: 0.75rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl, {
+        delay: { show: 500, hide: 100 }
+    });
+});
+
+// Search functionality for orders
+const searchInput = document.getElementById('order-search');
+const statusFilter = document.getElementById('status-filter');
+const dateFilter = document.getElementById('date-filter');
+
+function filterOrders() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const statusValue = statusFilter.value.toLowerCase();
+    const dateValue = dateFilter.value.toLowerCase();
+    
+    const orderRows = document.querySelectorAll('.order-row');
+    
+    orderRows.forEach(row => {
+        const orderId = row.querySelector('td:first-child').textContent.toLowerCase();
+        const orderDate = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        const orderStatus = row.querySelector('.status-badge').textContent.toLowerCase();
+        
+        // Combine all filters
+        const matchesSearch = orderId.includes(searchTerm);
+        const matchesStatus = statusValue === '' || orderStatus.includes(statusValue);
+        
+        // Simple date filtering (would need more complexity for real implementation)
+        let matchesDate = true;
+        if (dateValue !== '') {
+            // This is a simplified example - real implementation would need proper date comparison
+            matchesDate = true; // Assume all dates match for demo
+        }
+        
+        if (matchesSearch && matchesStatus && matchesDate) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Add event listeners to all filters
+if (searchInput) {
+    searchInput.addEventListener('input', filterOrders);
+}
+if (statusFilter) {
+    statusFilter.addEventListener('change', filterOrders);
+}
+if (dateFilter) {
+    dateFilter.addEventListener('change', filterOrders);
+}
+
+// Clear search box with escape key
+if (searchInput) {
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            filterOrders();
+        }
+    });
+}
+</script>
+{% endblock %} 

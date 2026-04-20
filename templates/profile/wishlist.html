@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}My Wishlist - Kickx Philippines{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Wishlist Items Section -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white py-3">
+                    <h4 class="mb-0">My Wishlist ({{ wishlist_items|length }})</h4>
+                </div>
+                <div class="card-body p-0">
+                    {% if wishlist_items and wishlist_items|length > 0 %}
+                        {% for item in wishlist_items %}
+                        <div class="wishlist-item border-bottom p-3">
+                            <div class="row align-items-center">
+                                <!-- Product Image -->
+                                <div class="col-md-2 col-sm-3 mb-3 mb-md-0">
+                                    <img src="{{ item.product.image_url or url_for('static', filename='images/placeholder.jpg') }}" 
+                                         alt="{{ item.product.name }}" 
+                                         class="img-fluid rounded">
+                                </div>
+                                <!-- Product Info -->
+                                <div class="col-md-5 col-sm-9 mb-3 mb-md-0">
+                                    <h5 class="mb-1">{{ item.product.name }}</h5>
+                                    <p class="text-muted mb-1">{{ item.product.brand.name }}</p>
+                                    {% if item.size %}
+                                    <p class="text-muted small mb-1">
+                                        <span class="badge bg-secondary me-1">Size: {{ item.size }}</span>
+                                        {% if item.quantity and item.quantity > 1 %}
+                                        <span class="badge bg-secondary">Qty: {{ item.quantity }}</span>
+                                        {% endif %}
+                                    </p>
+                                    {% endif %}
+                                    <div class="mt-2 d-md-none">
+                                        {% if item.product.discount_price %}
+                                        <span class="text-danger fw-bold me-2">₱{{ "%.2f"|format(item.product.discount_price) }}</span>
+                                        <span class="text-decoration-line-through text-muted">₱{{ "%.2f"|format(item.product.price) }}</span>
+                                        {% else %}
+                                        <span class="fw-bold">₱{{ "%.2f"|format(item.product.price) }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- Price -->
+                                <div class="col-md-2 d-none d-md-block text-center">
+                                    {% if item.product.discount_price %}
+                                    <span class="text-danger fw-bold d-block">₱{{ "%.2f"|format(item.product.discount_price) }}</span>
+                                    <span class="text-decoration-line-through text-muted">₱{{ "%.2f"|format(item.product.price) }}</span>
+                                    {% else %}
+                                    <span class="fw-bold">₱{{ "%.2f"|format(item.product.price) }}</span>
+                                    {% endif %}
+                                    {% if item.quantity > 1 %}
+                                    <span class="small text-muted mt-1">
+                                        Total: ₱{{ "%.2f"|format((item.product.discount_price or item.product.price) * item.quantity) }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <!-- Actions -->
+                                <div class="col-md-3 text-end">
+                                    <div class="d-flex flex-column flex-md-row justify-content-end gap-2">
+                                        <a href="{{ url_for('product_detail', slug=item.product.slug) }}" class="d-inline-block btn btn-primary btn-sm mb-2 mb-md-0">
+                                            <i class="bi bi-eye me-1"></i> View
+                                        </a>
+                                        <form method="post" action="{{ url_for('move_to_cart', item_id=item.id) }}" class="d-inline-block mb-2 mb-md-0">
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                                            </button>
+                                        </form>
+                                        <form method="post" action="{{ url_for('remove_from_wishlist', item_id=item.id) }}" class="d-inline-block">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="mb-3">
+                                <i class="bi bi-heart text-muted fa-3x"></i>
+                            </div>
+                            <h5 class="mb-2">Your wishlist is empty</h5>
+                            <p class="text-muted mb-4">Add items to your wishlist to keep track of products you're interested in.</p>
+                            <div class="d-grid gap-2 col-md-6 mx-auto">
+                                <a href="{{ url_for('new_arrivals') }}" class="btn btn-primary">Explore New Arrivals</a>
+                                <a href="{{ url_for('trending_products') }}" class="btn btn-outline-dark">Browse Trending</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wishlist Summary Section -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Wishlist Summary</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">Total Items: <span class="float-end fw-bold">{{ wishlist_items|length }}</span></p>
+                    <p class="mb-3">Total Value: 
+                        <span class="float-end fw-bold">
+                            ₱{{ "%.2f"|format(total_value) }}
+                        </span>
+                    </p>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('product_catalog') }}" class="btn btn-primary">
+                            Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recently Viewed -->
+            {% if recently_viewed %}
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Recently Viewed</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for product in recently_viewed %}
+                    <div class="recent-item border-bottom p-3">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ product.image_url or url_for('static', filename='images/placeholder.jpg') }}" 
+                                 alt="{{ product.name }}" 
+                                 class="img-fluid rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                            <div class="ms-3">
+                                <h6 class="mb-1">{{ product.name }}</h6>
+                                <div>
+                                    {% if product.discount_price %}
+                                    <span class="text-danger fw-bold me-2">₱{{ "%.2f"|format(product.discount_price) }}</span>
+                                    <span class="text-decoration-line-through text-muted">₱{{ "%.2f"|format(product.price) }}</span>
+                                    {% else %}
+                                    <span class="fw-bold">₱{{ "%.2f"|format(product.price) }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-sm btn-outline-dark ms-auto">
+                                View
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .wishlist-item:last-child {
+        border-bottom: none !important;
+    }
+    
+    .recent-item:last-child {
+        border-bottom: none !important;
+    }
+    
+    @media (max-width: 767.98px) {
+        .wishlist-item {
+            padding: 1.5rem 1rem;
+        }
+    }
+</style>
+{% endblock %} 

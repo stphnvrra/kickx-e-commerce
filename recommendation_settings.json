@@ -1,0 +1,9 @@
+{
+    "content_based_weight": 0.6,
+    "collaborative_weight": 0.4,
+    "min_recommendation_confidence": 0.3,
+    "max_recommendations_per_product": 6,
+    "enable_personalized_home": true,
+    "recommendation_refresh_hours": 24,
+    "trending_timespan_days": 7
+}

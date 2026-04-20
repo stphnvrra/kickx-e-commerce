@@ -1,0 +1,377 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Order #{{ order.id }} - Kickx{% endblock %}
+
+{% block header_title %}Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_orders') }}">Orders</a></li>
+            <li class="breadcrumb-item active">Order #{{ order.id }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Order #{{ order.id }}</h2>
+        <div>
+            <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-arrow-left me-1"></i> Back to Orders
+            </a>
+            <a href="{{ url_for('admin_update_order', order_id=order.id) }}" class="btn btn-primary">
+                <i class="fas fa-edit me-1"></i> Update Status
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="dashboard-card h-100 card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="card-title mb-0 fw-bold">Order Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Order Date:</span>
+                            <span class="fw-medium">
+                                {% if order.created_at %}
+                                    {{ order.created_at.strftime('%b %d, %Y %H:%M') }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Status:</span>
+                    <span class="status-badge status-{{ order.status }}">{{ order.status }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Payment Status:</span>
+                            <span class="status-badge status-{{ order.payment_status }}">{{ order.payment_status }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Payment Method:</span>
+                            <span>
+                                {% if order.payment_method == 'paypal' %}
+                                    <i class="fab fa-paypal me-1"></i> PayPal
+                                {% else %}
+                                    {{ order.payment_method|capitalize }}
+                                {% endif %}
+                            </span>
+                        </li>
+                        {% if order.payment_id %}
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Transaction ID:</span>
+                            <span class="small text-truncate" style="max-width: 180px;" title="{{ order.payment_id }}">{{ order.payment_id }}</span>
+                        </li>
+                        {% endif %}
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Total Amount:</span>
+                            <span class="fw-bold">₱{{ "%.2f"|format(order.total_amount) }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card h-100 card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="card-title mb-0 fw-bold">Customer Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Name:</span>
+                            <span>{{ order.user.first_name ~ ' ' ~ order.user.last_name if order.user else 'Unknown' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Email:</span>
+                            <span>{{ order.user.email if order.user else 'Unknown' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Phone:</span>
+                            <span>Not provided</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="dashboard-card h-100 card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 border-0">
+                    <h5 class="card-title mb-0 fw-bold">Shipping Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Address:</span>
+                            <span>{{ order.shipping_address }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">City:</span>
+                            <span>{{ order.shipping_city }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">State:</span>
+                            <span>{{ order.shipping_state }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Postal Code:</span>
+                            <span>{{ order.shipping_zip }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between px-0">
+                            <span class="text-muted">Country:</span>
+                            <span>{{ order.shipping_country }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <h5 class="card-title mb-0 fw-bold">Order Items</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover admin-table">
+                <thead>
+                    <tr>
+                            <th class="border-top-0">Product</th>
+                            <th class="border-top-0">Size</th>
+                            <th class="border-top-0">Quantity</th>
+                            <th class="border-top-0">Price</th>
+                            <th class="border-top-0 text-end">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items %}
+                    <tr>
+                        <td>
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item.product_info.image_url if item.product_info else url_for('static', filename='images/placeholder.jpg') }}" alt="{{ item.product_info.name if item.product_info else 'Product' }}" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <span>{{ item.product_info.name if item.product_info else 'Product #' ~ item.product_id }}</span>
+                            </div>
+                        </td>
+                        <td>{{ item.size }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₱{{ "%.2f"|format(item.price) }}</td>
+                            <td class="text-end">₱{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                            <td colspan="4" class="text-end fw-medium">Subtotal:</td>
+                            <td class="text-end">₱{{ "%.2f"|format(order.total_amount - order.shipping_cost) }}</td>
+                    </tr>
+                    <tr>
+                            <td colspan="4" class="text-end fw-medium">Shipping:</td>
+                            <td class="text-end">₱{{ "%.2f"|format(order.shipping_cost) }}</td>
+                    </tr>
+                    {% if order.discount_amount > 0 %}
+                    <tr>
+                            <td colspan="4" class="text-end fw-medium">Discount:</td>
+                            <td class="text-end">-₱{{ "%.2f"|format(order.discount_amount) }}</td>
+                    </tr>
+                    {% endif %}
+                        <tr>
+                            <td colspan="4" class="text-end fw-bold">Total:</td>
+                            <td class="text-end fw-bold">₱{{ "%.2f"|format(order.total_amount) }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    {% if order.notes %}
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <h5 class="card-title mb-0 fw-bold">Order Notes</h5>
+        </div>
+        <div class="card-body">
+            <div class="bg-light p-3 rounded">
+            {{ order.notes }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Update Status Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">Update Order Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+        <form id="statusForm" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="status" class="form-label">New Status</label>
+                        <select name="status" id="status" class="form-select" required>
+                    <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                    <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                    <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                    <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+                    <div class="mb-3">
+                        <label for="payment_status" class="form-label">Payment Status</label>
+                        <select name="payment_status" id="payment_status" class="form-select">
+                            <option value="pending" {% if order.payment_status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="paid" {% if order.payment_status == 'paid' %}selected{% endif %}>Paid</option>
+                            <option value="failed" {% if order.payment_status == 'failed' %}selected{% endif %}>Failed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+:root {
+    --primary-color: #EC5228;
+    --primary-light: rgba(236, 82, 40, 0.1);
+    --primary-hover: #d13e18;
+    --text-dark: #343a40;
+    --text-light: #6c757d;
+    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    --border-radius: 10px;
+    --transition: all 0.3s ease;
+    --light-bg: #f8f9fa;
+}
+
+body {
+    background-color: var(--light-bg);
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Admin Table */
+.admin-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.admin-table th {
+    background-color: rgba(0,0,0,0.02);
+    font-weight: 600;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    font-size: 13px;
+    color: var(--text-light);
+    vertical-align: middle;
+}
+
+.admin-table td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none !important;
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(236, 82, 40, 0.03);
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.status-pending {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #856404;
+}
+
+.status-processing {
+    background-color: rgba(23, 162, 184, 0.2);
+    color: #117a8b;
+}
+
+.status-shipped {
+    background-color: rgba(236, 82, 40, 0.2);
+    color: var(--primary-hover);
+}
+
+.status-delivered {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #1e7e34;
+}
+
+.status-cancelled {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #bd2130;
+}
+
+.status-paid {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #1e7e34;
+}
+
+.status-failed {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #bd2130;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const updateButton = document.querySelector('.update-status');
+    
+    // Only setup the modal functionality if this is not Order #7
+    // and if the update-status button exists (which it won't for Order #7)
+    if (updateButton && "{{ order.id }}" !== "7") {
+        const statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+    const statusForm = document.getElementById('statusForm');
+
+    updateButton.addEventListener('click', function() {
+        const orderId = this.dataset.orderId;
+            statusForm.action = "{{ url_for('admin_update_order', order_id=0) }}".replace('0', orderId);
+            statusModal.show();
+        });
+    }
+});
+</script>
+{% endblock %} 

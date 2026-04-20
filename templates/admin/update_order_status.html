@@ -1,0 +1,158 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Update Order #{{ order.id }} Status - Kickx{% endblock %}
+
+{% block header_title %}Update Order Status{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_orders') }}">Orders</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('admin_order_detail', order_id=order.id) }}">Order #{{ order.id }}</a></li>
+            <li class="breadcrumb-item active">Update Status</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Update Order #{{ order.id }} Status</h2>
+    </div>
+    
+    <p class="text-muted mb-4">Current status: <span class="status-badge status-{{ order.status }}">{{ order.status }}</span></p>
+
+    <div class="dashboard-card card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-0">
+            <div class="d-flex align-items-center">
+                <div class="card-icon me-3" style="background-color: #17a2b8;">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <h5 class="card-title mb-0">Update Status</h5>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <form method="POST" action="{{ url_for('admin_update_order', order_id=order.id) }}">
+                
+                <div class="mb-4">
+                    <label for="status" class="form-label fw-medium">Order Status</label>
+                    <select name="status" id="status" class="form-select" required>
+                        <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                        <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                        <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                        <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="payment_status" class="form-label fw-medium">Payment Status</label>
+                    <select name="payment_status" id="payment_status" class="form-select">
+                        <option value="pending" {% if order.payment_status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="paid" {% if order.payment_status == 'paid' %}selected{% endif %}>Paid</option>
+                        <option value="failed" {% if order.payment_status == 'failed' %}selected{% endif %}>Failed</option>
+                    </select>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Order
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Update Status
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Card styling */
+.card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.status-pending {
+    background-color: rgba(255, 193, 7, 0.2);
+    color: #856404;
+}
+
+.status-processing {
+    background-color: rgba(23, 162, 184, 0.2);
+    color: #117a8b;
+}
+
+.status-shipped {
+    background-color: rgba(236, 82, 40, 0.2);
+    color: var(--primary-color);
+}
+
+.status-delivered {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #1e7e34;
+}
+
+.status-cancelled {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #bd2130;
+}
+
+.status-paid {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #1e7e34;
+}
+
+.status-failed {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #bd2130;
+}
+
+/* Form styling */
+.form-control, .form-select {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
+    border-color: var(--primary-color);
+}
+</style>
+{% endblock %} 

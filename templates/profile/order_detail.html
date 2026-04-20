@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+
+{% block title %}Order #{{ order.id }} - Kickx{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <!-- Page Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div class="d-flex align-items-center">
+            <div>
+                <h1 class="mb-1">Order #{{ order.id }}</h1>
+                <p class="text-muted mb-0">Placed on {{ order.created_at.strftime('%B %d, %Y') if order.created_at else '-' }}</p>
+            </div>
+        </div>
+        <span class="badge bg-{{ status_color }} fs-6 px-3 py-2 rounded-pill text-uppercase">{{ order.status }}</span>
+    </div>
+
+    <!-- Order Timeline -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div class="order-timeline">
+                <div class="d-flex justify-content-between">
+                    <div class="timeline-step">
+                        <div class="timeline-step-circle {{ 'active' if order.status in ['pending', 'processing', 'shipped', 'delivered'] }}">
+                            <i class="bi bi-cart-check"></i>
+                        </div>
+                        <div class="timeline-step-label">Placed</div>
+                        <div class="timeline-step-date">{{ order.created_at.strftime('%b %d') if order.created_at else '-' }}</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-step-circle {{ 'active' if order.status in ['processing', 'shipped', 'delivered'] }}">
+                            <i class="bi bi-gear"></i>
+                        </div>
+                        <div class="timeline-step-label">Processing</div>
+                        <div class="timeline-step-date">{{ order.processing_date.strftime('%b %d') if order.processing_date else '-' }}</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-step-circle {{ 'active' if order.status in ['shipped', 'delivered'] }}">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <div class="timeline-step-label">Shipped</div>
+                        <div class="timeline-step-date">{{ order.shipping_date.strftime('%b %d') if order.shipping_date else '-' }}</div>
+                    </div>
+                    <div class="timeline-step">
+                        <div class="timeline-step-circle {{ 'active' if order.status == 'delivered' }}">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <div class="timeline-step-label">Delivered</div>
+                        <div class="timeline-step-date">{{ order.delivery_date.strftime('%b %d') if order.delivery_date else '-' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Order Items -->
+        <div class="col-lg-8">
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h4 class="card-title mb-0">Order Items</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Product</th>
+                                    <th>Size</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th class="text-end pe-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ item.product_info.image_url or url_for('static', filename='images/placeholder.jpg') }}" alt="{{ item.product_info.name }}" class="me-3 rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold mb-1">{{ item.product_info.name }}</div>
+                                                <div class="badge bg-light text-dark">
+                                                    {% if item.product_info.category %}
+                                                        {{ item.product_info.category.name }}
+                                                    {% else %}
+                                                        General
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ item.size }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₱{{ "%.2f"|format(item.price) }}</td>
+                                    <td class="text-end fw-bold pe-4">₱{{ "%.2f"|format(item.price * item.quantity) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Shipping Information -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h4 class="card-title mb-0">Shipping Information</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Shipping Address</h6>
+                            <p class="mb-4">
+                                {{ current_user.first_name }} {{ current_user.last_name }}<br>
+                                {{ order.shipping_address }}<br>
+                                {{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}<br>
+                                {{ order.shipping_country }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-2">Tracking Information</h6>
+                            {% if order.tracking_number %}
+                            <p class="mb-1"><strong>Tracking Number:</strong> {{ order.tracking_number }}</p>
+                            <p class="mb-0">
+
+                            </p>
+                            {% else %}
+                            <p class="text-muted">Tracking information will be available once your order ships.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4 sticky-md-top" style="top: 20px;">
+                <div class="card-header bg-white py-3">
+                    <h4 class="card-title mb-0">Order Summary</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Subtotal:</span>
+                        <span>₱{{ "%.2f"|format(order.total_amount - order.shipping_cost) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Shipping:</span>
+                        <span>₱{{ "%.2f"|format(order.shipping_cost or 0) }}</span>
+                    </div>
+                    {% if order.discount_amount and order.discount_amount > 0 %}
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Discount:</span>
+                        <span class="text-success">-₱{{ "%.2f"|format(order.discount_amount) }}</span>
+                    </div>
+                    {% endif %}
+                    <hr>
+                    <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+                        <span>Total:</span>
+                        <span>₱{{ "%.2f"|format(order.total_amount) }}</span>
+                    </div>
+                    
+                    <div class="mt-4">
+                        {% if order.status == 'delivered' %}
+                        <h6 class="mb-3">Product Reviews</h6>
+                        <div class="list-group">
+                            {% for item in order.items %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ item.product_info.image_url or url_for('static', filename='images/placeholder.jpg') }}" alt="{{ item.product_info.name if item.product_info else 'Product' }}" class="me-3 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                    <div>{{ item.product_info.name if item.product_info else 'Product #' ~ item.product_id }}</div>
+                                </div>
+                                {% if item.product_info and item.product_info.slug %}
+                                <a href="{{ url_for('product_detail', slug=item.product_info.slug) }}#review-form" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-star me-1"></i> Write Review
+                        </a>
+                                {% else %}
+                                <span class="badge bg-secondary">Product Unavailable</span>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Payment Information -->
+                    <hr class="my-4">
+                    <h5 class="mb-3">Payment Information</h5>
+                    <div class="mb-2">
+                        <span class="text-muted">Payment Method:</span>
+                        <span class="float-end fw-bold">
+                            {% if order.payment_method == 'paypal' %}
+                                <i class="fab fa-paypal me-1"></i> PayPal
+                            {% else %}
+                                {{ order.payment_method|capitalize }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted">Payment Status:</span>
+                        <span class="float-end fw-bold">
+                            {% if order.payment_status == 'paid' %}
+                                <span class="text-success">Paid</span>
+                            {% else %}
+                                {{ order.payment_status|capitalize }}
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% if order.payment_id %}
+                    <div class="mb-2">
+                        <span class="text-muted">Transaction ID:</span>
+                        <span class="float-end small">{{ order.payment_id }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+:root {
+    --primary-color: #f24e1e;
+    --primary-hover: #e13b0b;
+    --timeline-active: var(--primary-color);
+    --timeline-inactive: #e9ecef;
+}
+
+/* Page Header Styles */
+h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+/* Card Styles */
+.card {
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Badge Styles */
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529;
+}
+
+.badge.bg-info {
+    background-color: #0dcaf0 !important;
+    color: #212529;
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-color) !important;
+}
+
+.badge.bg-success {
+    background-color: #198754 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Timeline Styles */
+.order-timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.order-timeline::before {
+    content: '';
+    position: absolute;
+    top: 50px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: var(--timeline-inactive);
+    z-index: 0;
+}
+
+.timeline-step {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+    padding: 0 10px;
+}
+
+.timeline-step-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--timeline-inactive);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: #fff;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.timeline-step-circle.active {
+    background: var(--timeline-active);
+    box-shadow: 0 0 0 5px rgba(242, 78, 30, 0.2);
+}
+
+.timeline-step-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 4px;
+}
+
+.timeline-step-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+/* Table Styles */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    color: #495057;
+    border-top: none;
+    padding: 1rem;
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+/* Make the design responsive */
+@media (max-width: 767.98px) {
+    .order-timeline::before {
+        left: 20px;
+        right: 20px;
+    }
+    
+    .timeline-step-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .timeline-step-label {
+        font-size: 0.8rem;
+    }
+    
+    .timeline-step-date {
+        font-size: 0.7rem;
+    }
+    
+    .table-responsive {
+        margin-left: -0.75rem;
+        margin-right: -0.75rem;
+        width: calc(100% + 1.5rem);
+    }
+}
+</style>
+{% endblock %} 

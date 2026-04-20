@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}{% if address %}Edit{% else %}Add New{% endif %} Address - Kickx{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-md- d-flex justify-content-center">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">{% if address %}Edit{% else %}Add New{% endif %} Address</h2>
+                    
+                    <form method="POST" class="needs-validation" novalidate>
+                        
+                        <div class="row g-3">
+                            <!-- Full Name -->
+                            <div class="col-12">
+                                <label for="full_name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" 
+                                       value="{{ address.full_name if address else '' }}" required>
+                                <div class="invalid-feedback">
+                                    Please enter your full name.
+                                </div>
+                            </div>
+                            
+                            <!-- Phone Number -->
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       value="{{ address.phone if address else '' }}" required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid phone number.
+                                </div>
+                            </div>
+                            
+                            <!-- Street Address -->
+                            <div class="col-12">
+                                <label for="street_address" class="form-label">Street Address</label>
+                                <input type="text" class="form-control" id="street_address" name="street_address" 
+                                       value="{{ address.street_address if address else '' }}" required>
+                                <div class="invalid-feedback">
+                                    Please enter your street address.
+                                </div>
+                            </div>
+                            
+                            <!-- City -->
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="city" 
+                                       value="{{ address.city if address else '' }}" required>
+                                <div class="invalid-feedback">
+                                    Please enter your city.
+                                </div>
+                            </div>
+                            
+                            <!-- State/Province -->
+                            <div class="col-md-6">
+                                <label for="state" class="form-label">State/Province</label>
+                                <input type="text" class="form-control" id="state" name="state" 
+                                       value="{{ address.state if address else '' }}" required>
+                                <div class="invalid-feedback">
+                                    Please enter your state or province.
+                                </div>
+                            </div>
+                            
+                            <!-- Postal Code -->
+                            <div class="col-md-6">
+                                <label for="postal_code" class="form-label">Postal Code</label>
+                                <input type="text" class="form-control" id="postal_code" name="postal_code" 
+                                       value="{{ address.postal_code if address else '' }}" required>
+                                <div class="invalid-feedback">
+                                    Please enter your postal code.
+                                </div>
+                            </div>
+                            
+                            <!-- Country -->
+                            <div class="col-md-6">
+                                <label for="country" class="form-label">Country</label>
+                                <select class="form-select" id="country" name="country" required>
+                                    <option value="">Select Country</option>
+                                    <option value="Philippines" {{ 'selected' if address and address.country == 'Philippines' else '' }}>Philippines</option>
+                                    <option value="United States" {{ 'selected' if address and address.country == 'United States' else '' }}>United States</option>
+                                    <option value="Canada" {{ 'selected' if address and address.country == 'Canada' else '' }}>Canada</option>
+                                    <option value="United Kingdom" {{ 'selected' if address and address.country == 'United Kingdom' else '' }}>United Kingdom</option>
+                                    <option value="Australia" {{ 'selected' if address and address.country == 'Australia' else '' }}>Australia</option>
+                                    <option value="Germany" {{ 'selected' if address and address.country == 'Germany' else '' }}>Germany</option>
+                                    <option value="France" {{ 'selected' if address and address.country == 'France' else '' }}>France</option>
+                                    <option value="Japan" {{ 'selected' if address and address.country == 'Japan' else '' }}>Japan</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select your country.
+                                </div>
+                            </div>
+                            
+                            <!-- Default Address -->
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_default" name="is_default" 
+                                           {{ 'checked' if address and address.is_default else '' }}>
+                                    <label class="form-check-label" for="is_default">
+                                        Set as default shipping address
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Buttons -->
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    {% if address %}Update{% else %}Save{% endif %} Address
+                                </button>
+                                <a href="{{ url_for('profile_addresses') }}" class="btn btn-outline-secondary ms-2">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.card-body {
+    border-radius: 10px;
+}
+
+.nav-link {
+    color: #495057;
+    padding: 0.5rem 0;
+}
+
+.nav-link.active {
+    color: #0d6efd;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: #0d6efd;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %} 

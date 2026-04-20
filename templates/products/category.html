@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} - Kickx{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('products.catalog') }}">Shop</a></li>
+            <li class="breadcrumb-item active">{{ category.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">{{ category.name }}</h1>
+            {% if category.description %}
+            <p class="lead">{{ category.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if products %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 product-card">
+                <div class="product-image-container">
+                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% if product.discount_price %}
+                    <div class="discount-badge">
+                        {{ "%.0f"|format((1 - product.discount_price / product.price) * 100) }}% OFF
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.brand.name }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="price-container">
+                            {% if product.discount_price %}
+                            <span class="original-price">${{ "%.2f"|format(product.price) }}</span>
+                            <span class="discount-price">${{ "%.2f"|format(product.discount_price) }}</span>
+                            {% else %}
+                            <span class="price">${{ "%.2f"|format(product.price) }}</span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('products.detail', slug=product.slug) }}" class="btn btn-sm btn-outline-dark">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col text-center py-5">
+            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+            <h3>No products found</h3>
+            <p>There are no products available in this category at the moment.</p>
+            <a href="{{ url_for('products.catalog') }}" class="btn btn-primary mt-3">Browse All Products</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.product-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.product-image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-right: 5px;
+}
+
+.discount-price {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.price {
+    font-weight: bold;
+}
+</style>
+{% endblock %} 

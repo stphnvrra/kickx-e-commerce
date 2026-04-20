@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard - Kickx{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <h1 class="h2 mb-0">Welcome Back, {{ user.first_name or user.username }}</h1>
+            <p class="text-muted">Manage your orders, wishlist, and settings</p>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-box me-2 text-primary"></i>My Orders</h5>
+                    <p class="card-text">View and track your order history</p>
+                    <a href="{{ url_for('profile_orders') }}" class="btn btn-outline-primary btn-sm">
+                        View Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-heart me-2 text-primary"></i>Wishlist</h5>
+                    <p class="card-text">Products you've saved for later</p>
+                    <a href="{{ url_for('profile_wishlist') }}" class="btn btn-outline-primary btn-sm">
+                        View Wishlist
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-cog me-2 text-primary"></i>Account Settings</h5>
+                    <p class="card-text">Update your profile and preferences</p>
+                    <a href="{{ url_for('profile_settings') }}" class="btn btn-outline-primary btn-sm">
+                        Edit Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="row mb-5">
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Orders</h5>
+                    {% if recent_orders %}
+                    <a href="{{ url_for('profile_orders') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_orders %}
+                    <div class="list-group list-group-flush">
+                        {% for order in recent_orders %}
+                        <a href="{{ url_for('profile_order_detail', order_id=order.id) }}" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1 text-primary fw-bold">#{{ order.id }}</p>
+                                    <p class="mb-1">{{ order.created_at.strftime('%B %d, %Y') }}</p>
+                                    <small class="badge bg-{{ {'pending': 'warning', 'processing': 'info', 'shipped': 'primary', 'delivered': 'success', 'cancelled': 'danger'}[order.status] }}">
+                                        {{ order.status | capitalize }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <p class="mb-1 fw-bold">₱{{ "%.2f"|format(order.total_amount) }}</p>
+                                    <small class="text-muted">{{ order.items.count() }} item{% if order.items.count() != 1 %}s{% endif %}</small>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                        <h4>No Orders Yet</h4>
+                        <p class="text-muted mb-3">Looks like you haven't placed any orders yet.</p>
+                        <a href="{{ url_for('product_catalog') }}" class="btn btn-sm btn-primary">Start Shopping</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Preview and Shipping Address Section -->
+    <div class="row">
+        <!-- Wishlist Preview -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Wishlist</h5>
+                    {% if wishlist_items %}
+                    <a href="{{ url_for('profile_wishlist') }}" class="btn btn-primary">View All</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if wishlist_items %}
+                    <div class="row row-cols-2 g-3">
+                        {% for item in wishlist_items[:4] %}
+                        <div class="col">
+                            <div class="card h-100 border">
+                                <img src="{{ item.product.image_url }}" class="card-img-top" alt="{{ item.product.name }}">
+                                <div class="card-body p-2">
+                                    <h6 class="card-title small text-truncate">{{ item.product.name }}</h6>
+                                    <p class="card-text fw-bold mb-0">₱{{ "%.2f"|format(item.product.price) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                        <h4>Wishlist is Empty</h4>
+                        <p class="text-muted mb-3">Save items you like for later.</p>
+                        <a href="{{ url_for('product_catalog') }}" class="btn btn-sm btn-primary">Browse Products</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Default Shipping Address -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Default Shipping Address</h5>
+                    {% if default_address %}
+                    <a href="{{ url_for('profile_edit_address', address_id=default_address.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if default_address %}
+                    <div class="address-card p-3 border rounded mb-3">
+                        <h6 class="mb-2">{{ default_address.full_name }}</h6>
+                        <p class="mb-1">{{ default_address.street_address }}</p>
+                        <p class="mb-1">{{ default_address.city }}, {{ default_address.state }} {{ default_address.postal_code }}</p>
+                        <p class="mb-1">{{ default_address.country }}</p>
+                        <p class="mb-1">Phone: {{ default_address.phone }}</p>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
+                        <h4>No Default Address</h4>
+                        <p class="text-muted mb-3">Add a shipping address for faster checkout.</p>
+                        <a href="{{ url_for('profile_addresses') }}" class="btn btn-sm btn-primary">Add Address</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+/* Welcome Banner */
+.welcome-banner {
+    border-radius: 10px;
+    background: linear-gradient(to right, rgba(236, 82, 40, 0.05), rgba(236, 82, 40, 0.1));
+}
+
+.welcome-icon {
+    width: 48px;
+    height: 48px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+}
+
+.profile-nav-buttons .btn {
+    border-radius: 20px;
+    padding: 0.375rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.profile-nav-buttons .btn:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.orders-icon {
+    background-color: #0d6efd;
+}
+
+.wishlist-icon {
+    background-color: #dc3545;
+}
+
+.account-icon {
+    background-color: #198754;
+}
+
+.address-icon {
+    background-color: #6f42c1;
+}
+
+/* List Items */
+.list-group-item-action {
+    transition: all 0.2s ease;
+}
+
+.list-group-item-action:hover {
+    background-color: rgba(236, 82, 40, 0.05);
+}
+
+/* Wishlist Count */
+.count-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(236, 82, 40, 0.1);
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Empty States */
+.empty-icon {
+    opacity: 0.5;
+}
+
+/* Info Items */
+.info-value {
+    font-weight: 500;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .welcome-banner .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .profile-nav-buttons {
+        margin-top: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %} 

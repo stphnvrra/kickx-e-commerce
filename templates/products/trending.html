@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Trending Sneakers - Kickx{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">Trending Sneakers</h1>
+            <p class="lead"> Our most popular sneakers right now</p>
+        </div>
+    </div>
+
+    {% if products %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 product-card">
+                <div class="position-relative">
+                    <img src="{{ product.image_url or url_for('static', filename='images/placeholder.jpg') }}" 
+                         class="card-img-top" 
+                         alt="{{ product.name }}">
+                    <div class="trending-badge">
+                        <i class="bi bi-fire"></i> Trending
+                    </div>
+                    {% if product.discount_price %}
+                    <span class="badge bg-primary position-absolute top-0 end-0 m-2">-{{ ((product.price - product.discount_price) / product.price * 100) | round | int }}%</span>
+                    {% endif %}
+                    {% if product.is_verified %}
+                    <span class="badge bg-success position-absolute bottom-0 end-0 m-2 verification-badge">
+                        <i class="bi bi-check-circle-fill me-1"></i> Verified
+                    </span>
+                    {% endif %}
+                    <button class="btn btn-light btn-sm position-absolute top-0 start-0 m-2 wishlist-btn" 
+                            data-product-id="{{ product.id }}"
+                            title="Add to Wishlist">
+                        <i class="bi bi-heart{% if product.in_wishlist %}-fill text-primary{% endif %}"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">{{ product.brand.name }}</h6>
+                    <h5 class="card-title mb-2">{{ product.name }}</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if product.discount_price %}
+                            <p class="price mb-0">
+                                <span class="text-danger">₱{{ "%.2f"|format(product.discount_price) }}</span>
+                                <span class="text-muted text-decoration-line-through">₱{{ "%.2f"|format(product.price) }}</span>
+                            </p>
+                            {% else %}
+                            <p class="price mb-0">₱{{ "%.2f"|format(product.price) }}</p>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ product.num_reviews if product.num_reviews else 0 }} reviews</small>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-top-0">
+                    <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary w-100">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col text-center py-5">
+            <i class="bi bi-fire fa-3x text-muted mb-3"></i>
+            <h3>No trending products yet</h3>
+            <p>Check back soon for our most popular sneakers!</p>
+            <a href="{{ url_for('product_catalog') }}" class="btn btn-primary mt-3">Browse All Products</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.product-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.trending-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: var(--bs-primary);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.wishlist-btn {
+    opacity: 0.8;
+}
+
+.wishlist-btn:hover {
+    opacity: 1;
+}
+
+.price {
+    font-weight: bold;
+}
+
+.verification-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle wishlist buttons
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            const icon = this.querySelector('i');
+            
+            fetch(`/api/wishlist/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.in_wishlist) {
+                    icon.classList.remove('bi-heart');
+                    icon.classList.add('bi-heart-fill', 'text-primary');
+                } else {
+                    icon.classList.remove('bi-heart-fill', 'text-primary');
+                    icon.classList.add('bi-heart');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 
