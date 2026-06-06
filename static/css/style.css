@@ -150,7 +150,6 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .section-title {
 }
 
 .floating-sneaker-card:hover {
-    transform: translateY(-15px) scale(1.03);
     border-color: rgba(236, 82, 40, 0.4);
     box-shadow: 0 30px 60px rgba(236, 82, 40, 0.15);
 }
@@ -165,15 +164,31 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .section-title {
     z-index: 1;
     opacity: 0.85;
 }
+.card-left:hover {
+    transform: translate(-100px, -45px) rotate(-8deg) scale(1.05);
+    z-index: 10;
+    opacity: 1;
+}
+
 /* Card 2 Offset (Center focus) */
 .card-center {
     z-index: 3;
 }
+.card-center:hover {
+    transform: translateY(-15px) scale(1.05);
+    z-index: 10;
+}
+
 /* Card 3 Offset */
 .card-right {
     transform: translate(100px, 40px) rotate(8deg);
     z-index: 1;
     opacity: 0.85;
+}
+.card-right:hover {
+    transform: translate(100px, 25px) rotate(8deg) scale(1.05);
+    z-index: 10;
+    opacity: 1;
 }
 
 /* How It Works Section */
@@ -266,6 +281,13 @@ h1, h2, h3, h4, h5, h6, .navbar-brand, .section-title {
     top: 0; left: 0; right: 0; bottom: 0;
     background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
     background-size: 20px 20px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.relative-z {
+    position: relative;
+    z-index: 2;
 }
 
 .sparks-overlay {

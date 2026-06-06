@@ -14,38 +14,45 @@
                 </div>
                 <h1 class="display-3 fw-bold mb-4 text-white">
                     Got Style? <br class="d-none d-lg-block">Get Kicks. <br>
-                    <span class="text-primary" style="color: #ff7c54 !important;">Need Heat?</span> <br class="d-none d-lg-block">Shop KickX.
+                    <span class="text-primary" style="color: #ff7c54 !important;">Need Heat?</span> <br
+                        class="d-none d-lg-block">Shop KickX.
                 </h1>
                 <p class="lead mb-4 text-light opacity-90" style="font-size: 1.15rem;">
-                    Step into premium authenticity. Discover, secure, and showcase the world's most sought-after limited-edition sneakers. Verified genuine. Secured by PayPal.
+                    Step into premium authenticity. Discover, secure, and showcase the world's most sought-after
+                    limited-edition sneakers. Verified genuine. Secured by PayPal.
                 </p>
                 <div class="hero-cta-group justify-content-center justify-content-lg-start">
-                    <a href="{{ url_for('product_catalog') }}" class="btn btn-primary btn-lg px-4 py-3 fw-bold">Explore Catalog</a>
+                    <a href="{{ url_for('product_catalog') }}" class="btn btn-primary btn-lg px-4 py-3 fw-bold">Explore
+                        Catalog</a>
                     <a href="#how-it-works" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold">How It Works</a>
                 </div>
             </div>
-            
+
             <!-- Floating Sneakers Showcase -->
             <div class="col-lg-6 d-none d-lg-block">
                 <div class="hero-sneaker-container">
                     <!-- Card Left: Yeezy -->
                     <div class="floating-sneaker-card card-left">
-                        <span class="product-badge">Yeezy</span>
-                        <img src="{{ url_for('static', filename='uploads/products/yeezy-boost-350-v2-zebra-ge10_1747921189.jpg') }}" alt="Yeezy 350 Zebra">
-                        <div class="mt-2 text-center text-white-50 small">Boost 350 V2 Zebra</div>
+                        <span class="product-badge">Puma</span>
+                        <img src="{{ url_for('static', filename='uploads/products/puma-suede-classic-1et4_1747128503.jpg') }}"
+                            alt="Yeezy 350 Zebra">
+                        <div class="mt-2 text-center text-white-50 small">Puma Suede Classic</div>
                     </div>
-                    
+
                     <!-- Card Center: Jordan 1 Chicago -->
                     <div class="floating-sneaker-card card-center">
-                        <span class="product-badge verified bg-success"><i class="fas fa-check-circle"></i> VERIFIED</span>
-                        <img src="{{ url_for('static', filename='uploads/products/air-jordan-1-high-og-chicago-tfra_1747921176.jpg') }}" alt="Air Jordan 1 Chicago">
+                        <span class="product-badge verified bg-success"><i class="fas fa-check-circle"></i>
+                            VERIFIED</span>
+                        <img src="{{ url_for('static', filename='uploads/products/air-jordan-1-high-og-chicago-tfra_1747921176.jpg') }}"
+                            alt="Air Jordan 1 Chicago">
                         <div class="mt-2 text-center text-white fw-bold">Air Jordan 1 High Chicago</div>
                     </div>
-                    
+
                     <!-- Card Right: Adidas Forum -->
                     <div class="floating-sneaker-card card-right">
                         <span class="product-badge">Adidas</span>
-                        <img src="{{ url_for('static', filename='uploads/products/adidas-forum-low_1747127679.jpg') }}" alt="Adidas Forum Low">
+                        <img src="{{ url_for('static', filename='uploads/products/adidas-forum-low_1747127679.jpg') }}"
+                            alt="Adidas Forum Low">
                         <div class="mt-2 text-center text-white-50 small">Forum Low Classic</div>
                     </div>
                 </div>
@@ -58,8 +65,9 @@
 <section id="how-it-works" class="section py-5 bg-white">
     <div class="container text-center">
         <h2 class="section-title text-center">How It Works</h2>
-        <p class="text-muted col-md-8 mx-auto mb-5">Getting your hands on verified premium kicks has never been easier. We handle the authentication, trust, and delivery so you can focus on style.</p>
-        
+        <p class="text-muted col-md-8 mx-auto mb-5">Getting your hands on verified premium kicks has never been easier.
+            We handle the authentication, trust, and delivery so you can focus on style.</p>
+
         <div class="row g-4 mt-2">
             <!-- Step 1 -->
             <div class="col-md-4">
@@ -69,10 +77,11 @@
                         <i class="fas fa-search-plus"></i>
                     </div>
                     <h4>1. Browse Selection</h4>
-                    <p class="text-muted mb-0">Explore our catalog of authentic, premium sneakers from top international brands and verified collectors.</p>
+                    <p class="text-muted mb-0">Explore our catalog of authentic, premium sneakers from top international
+                        brands and verified collectors.</p>
                 </div>
             </div>
-            
+
             <!-- Step 2 -->
             <div class="col-md-4">
                 <div class="step-card h-100">
@@ -81,10 +90,11 @@
                         <i class="fas fa-user-shield"></i>
                     </div>
                     <h4>2. Personalize & Verify</h4>
-                    <p class="text-muted mb-0">Select your custom fit size. Every single pair undergoes multi-point physical verification to ensure 100% authenticity.</p>
+                    <p class="text-muted mb-0">Select your custom fit size. Every single pair undergoes multi-point
+                        physical verification to ensure 100% authenticity.</p>
                 </div>
             </div>
-            
+
             <!-- Step 3 -->
             <div class="col-md-4">
                 <div class="step-card h-100">
@@ -93,7 +103,8 @@
                         <i class="fab fa-cc-paypal"></i>
                     </div>
                     <h4>3. Secure Checkout</h4>
-                    <p class="text-muted mb-0">Complete your checkout smoothly with PayPal security. We ship directly to your door with tracking.</p>
+                    <p class="text-muted mb-0">Complete your checkout smoothly with PayPal security. We ship directly to
+                        your door with tracking.</p>
                 </div>
             </div>
         </div>
@@ -106,7 +117,7 @@
     <div class="container">
         <h2 class="section-title">Picked For You</h2>
         <p class="text-muted mb-5">Personalized recommendations based on your unique style and brands you love.</p>
-        
+
         <div class="row g-4">
             {% for product in personalized_recommendations %}
             <div class="col-lg-3 col-md-6">
@@ -119,10 +130,12 @@
                     </div>
                     <div class="product-info-wrapper">
                         <div class="product-brand">{{ product.brand.name }}</div>
-                        <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}" class="text-decoration-none text-dark">{{ product.name }}</a></h5>
+                        <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}"
+                                class="text-decoration-none text-dark">{{ product.name }}</a></h5>
                         <div class="product-price-row">
                             <span class="product-price">₱{{ "{:,.2f}".format(product.price) }}</span>
-                            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
+                            <a href="{{ url_for('product_detail', slug=product.slug) }}"
+                                class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -138,7 +151,7 @@
     <div class="container">
         <h2 class="section-title">Featured Heat</h2>
         <p class="text-muted mb-5">Handpicked premium releases currently trending in the global sneaker market.</p>
-        
+
         <div class="row g-4">
             {% for product in featured_products %}
             <div class="col-lg-3 col-md-6">
@@ -151,10 +164,12 @@
                     </div>
                     <div class="product-info-wrapper">
                         <div class="product-brand">{{ product.brand.name }}</div>
-                        <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}" class="text-decoration-none text-dark">{{ product.name }}</a></h5>
+                        <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}"
+                                class="text-decoration-none text-dark">{{ product.name }}</a></h5>
                         <div class="product-price-row">
                             <span class="product-price">₱{{ "{:,.2f}".format(product.price) }}</span>
-                            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
+                            <a href="{{ url_for('product_detail', slug=product.slug) }}"
+                                class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -171,17 +186,23 @@
         <div class="row align-items-center relative-z">
             <div class="col-lg-6 text-center text-lg-start mb-4 mb-lg-0">
                 <h3 class="display-5 fw-bold text-white mb-3">Join the KickX Circle</h3>
-                <p class="lead text-white-50 mb-4">Become a member of our exclusive sneaker inner circle. Get first access to hyped drops, member-only discounts, and personalized alerts.</p>
+                <p class="lead text-white-50 mb-4">Become a member of our exclusive sneaker inner circle. Get first
+                    access to hyped drops, member-only discounts, and personalized alerts.</p>
                 <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
                     {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('product_catalog') }}" class="btn btn-light text-primary fw-bold px-4 py-3 rounded-pill" style="color: #EC5228 !important;">Shop the Collection</a>
+                    <a href="{{ url_for('product_catalog') }}"
+                        class="btn btn-light text-primary fw-bold px-4 py-3 rounded-pill"
+                        style="color: #EC5228 !important;">Shop the Collection</a>
                     {% else %}
-                    <a href="{{ url_for('register') }}" class="btn btn-light text-primary fw-bold px-4 py-3 rounded-pill" style="color: #EC5228 !important;">Join Now (Free)</a>
-                    <a href="{{ url_for('login') }}" class="btn btn-outline-light fw-bold px-4 py-3 rounded-pill">Sign In</a>
+                    <a href="{{ url_for('register') }}"
+                        class="btn btn-light text-primary fw-bold px-4 py-3 rounded-pill"
+                        style="color: #EC5228 !important;">Join Now</a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light fw-bold px-4 py-3 rounded-pill">Sign
+                        In</a>
                     {% endif %}
                 </div>
             </div>
-            
+
             <div class="col-lg-6">
                 <div class="row g-3">
                     <!-- Badge 1 -->
@@ -189,7 +210,8 @@
                         <div class="trust-badge-item">
                             <div class="trust-badge-icon"><i class="fas fa-check-double"></i></div>
                             <h5 class="text-white">0% Fake Risk</h5>
-                            <p class="text-white-50 small mb-0">Every single sneaker is physically inspected and authenticated by top experts before dispatch.</p>
+                            <p class="text-white-50 small mb-0">Every single sneaker is physically inspected and
+                                authenticated by top experts before dispatch.</p>
                         </div>
                     </div>
                     <!-- Badge 2 -->
@@ -197,7 +219,8 @@
                         <div class="trust-badge-item">
                             <div class="trust-badge-icon"><i class="fab fa-paypal"></i></div>
                             <h5 class="text-white">Secure PayPal Pay</h5>
-                            <p class="text-white-50 small mb-0">Fully backed by PayPal buyer protection guidelines, securing every transaction.</p>
+                            <p class="text-white-50 small mb-0">Fully backed by PayPal buyer protection guidelines,
+                                securing every transaction.</p>
                         </div>
                     </div>
                     <!-- Badge 3 -->
@@ -205,7 +228,8 @@
                         <div class="trust-badge-item">
                             <div class="trust-badge-icon"><i class="fas fa-truck-moving"></i></div>
                             <h5 class="text-white">Direct Express</h5>
-                            <p class="text-white-50 small mb-0">Tracked, speed-delivery shipping directly to your doorstep in premium protective boxing.</p>
+                            <p class="text-white-50 small mb-0">Tracked, speed-delivery shipping directly to your
+                                doorstep in premium protective boxing.</p>
                         </div>
                     </div>
                     <!-- Badge 4 -->
@@ -213,7 +237,8 @@
                         <div class="trust-badge-item">
                             <div class="trust-badge-icon"><i class="fas fa-history"></i></div>
                             <h5 class="text-white">24/7 Heat Checks</h5>
-                            <p class="text-white-50 small mb-0">Constant drops, trend tracking, and custom notifications based on market values.</p>
+                            <p class="text-white-50 small mb-0">Constant drops, trend tracking, and custom notifications
+                                based on market values.</p>
                         </div>
                     </div>
                 </div>
@@ -227,7 +252,7 @@
     <div class="container">
         <h2 class="section-title">New Arrivals</h2>
         <p class="text-muted mb-5">Just added to the store. Grab them before they sell out.</p>
-        
+
         <div class="row g-4">
             {% for product in new_arrivals %}
             <div class="col-lg-3 col-md-6">
@@ -240,10 +265,12 @@
                     </div>
                     <div class="product-info-wrapper">
                         <div class="product-brand">{{ product.brand.name }}</div>
-                        <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}" class="text-decoration-none text-dark">{{ product.name }}</a></h5>
+                        <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}"
+                                class="text-decoration-none text-dark">{{ product.name }}</a></h5>
                         <div class="product-price-row">
                             <span class="product-price">₱{{ "{:,.2f}".format(product.price) }}</span>
-                            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
+                            <a href="{{ url_for('product_detail', slug=product.slug) }}"
+                                class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -258,7 +285,7 @@
     <div class="container">
         <h2 class="section-title">Trending Now</h2>
         <p class="text-muted mb-5">Most viewed and desired sneakers in our catalog this week.</p>
-        
+
         <div class="row g-4">
             {% for product in trending %}
             <div class="col-lg-3 col-md-6">
@@ -271,10 +298,12 @@
                     </div>
                     <div class="product-info-wrapper">
                         <div class="product-brand">{{ product.brand.name }}</div>
-                        <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}" class="text-decoration-none text-dark">{{ product.name }}</a></h5>
+                        <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}"
+                                class="text-decoration-none text-dark">{{ product.name }}</a></h5>
                         <div class="product-price-row">
                             <span class="product-price">₱{{ "{:,.2f}".format(product.price) }}</span>
-                            <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
+                            <a href="{{ url_for('product_detail', slug=product.slug) }}"
+                                class="btn btn-outline-primary btn-sm rounded-pill px-3">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -295,29 +324,34 @@
                     <img src="{{ url_for('static', filename='images/categories/running.jpg') }}" alt="Running Category">
                     <div class="category-overlay">
                         <h3 class="category-title">Running</h3>
-                        <a href="{{ url_for('category_products', slug='running') }}" class="category-btn text-decoration-none">Shop Now</a>
+                        <a href="{{ url_for('category_products', slug='running') }}"
+                            class="category-btn text-decoration-none">Shop Now</a>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Basketball Category -->
             <div class="col-md-4">
                 <div class="category-card">
-                    <img src="{{ url_for('static', filename='images/categories/basketball.jpg') }}" alt="Basketball Category">
+                    <img src="{{ url_for('static', filename='images/categories/basketball.jpg') }}"
+                        alt="Basketball Category">
                     <div class="category-overlay">
                         <h3 class="category-title">Basketball</h3>
-                        <a href="{{ url_for('category_products', slug='basketball') }}" class="category-btn text-decoration-none">Shop Now</a>
+                        <a href="{{ url_for('category_products', slug='basketball') }}"
+                            class="category-btn text-decoration-none">Shop Now</a>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Lifestyle Category -->
             <div class="col-md-4">
                 <div class="category-card">
-                    <img src="{{ url_for('static', filename='images/categories/lifestyle.jpg') }}" alt="Lifestyle Category">
+                    <img src="{{ url_for('static', filename='images/categories/lifestyle.jpg') }}"
+                        alt="Lifestyle Category">
                     <div class="category-overlay">
                         <h3 class="category-title">Lifestyle</h3>
-                        <a href="{{ url_for('category_products', slug='lifestyle') }}" class="category-btn text-decoration-none">Shop Now</a>
+                        <a href="{{ url_for('category_products', slug='lifestyle') }}"
+                            class="category-btn text-decoration-none">Shop Now</a>
                     </div>
                 </div>
             </div>
@@ -331,9 +365,13 @@
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center position-relative" style="z-index: 2;">
                 <h3 class="display-6 fw-bold mb-3">Join the Drop Alerts</h3>
-                <p class="lead text-white-50 mb-4">Never miss a restock or limited release drop. Get instant SMS & email notifications.</p>
-                <form class="newsletter-form d-flex flex-column flex-sm-row gap-2 max-width-md mx-auto" style="max-width: 500px;">
-                    <input type="email" class="form-control rounded-pill px-4" placeholder="Enter your email address" required style="border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); color: #fff;">
+                <p class="lead text-white-50 mb-4">Never miss a restock or limited release drop. Get instant SMS & email
+                    notifications.</p>
+                <form class="newsletter-form d-flex flex-column flex-sm-row gap-2 max-width-md mx-auto"
+                    style="max-width: 500px;">
+                    <input type="email" class="form-control rounded-pill px-4" placeholder="Enter your email address"
+                        required
+                        style="border: 1px solid rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); color: #fff;">
                     <button class="btn btn-primary rounded-pill px-4 fw-bold" type="submit">Subscribe</button>
                 </form>
             </div>
@@ -349,7 +387,7 @@
 {% block extra_js %}
 <script>
     // Newsletter form submission
-    document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
+    document.querySelector('.newsletter-form').addEventListener('submit', function (e) {
         e.preventDefault();
         const email = this.querySelector('input[type="email"]').value;
         alert('Thank you for subscribing! We will notify you on the next drop alert.');
