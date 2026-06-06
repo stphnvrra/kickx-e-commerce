@@ -91,7 +91,7 @@
                                     <div class="product-info">
                                         <img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">
                                         <div>
-                                            <a href="{{ url_for('main.product_detail', product_id=item.product.id) }}">{{ item.product.name }}</a>
+                                            <a href="{{ url_for('product_detail', slug=item.product.slug) }}">{{ item.product.name }}</a>
                                             <p class="product-sku">SKU: {{ item.product.sku }}</p>
                                         </div>
                                     </div>
@@ -199,10 +199,10 @@
             <h2>Need Help?</h2>
             <p>If you have any questions about your order, please contact our customer support team.</p>
             <div class="support-actions">
-                <a href="{{ url_for('main.contact') }}" class="btn btn-primary">
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">
                     <i class="fas fa-envelope"></i> Contact Support
                 </a>
-                <a href="{{ url_for('main.faq') }}" class="btn btn-secondary">
+                <a href="{{ url_for('faq') }}" class="btn btn-secondary">
                     <i class="fas fa-question-circle"></i> FAQ
                 </a>
             </div>

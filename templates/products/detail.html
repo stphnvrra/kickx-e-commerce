@@ -3,13 +3,13 @@
 {% block title %}{{ product.name }} - Kickx{% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-5">
+<div class="pt-2">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('product_catalog') }}">Sneakers</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-decoration-none" style="color: #EC5228;">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('product_catalog') }}" class="text-decoration-none" style="color: #EC5228;">Sneakers</a></li>
+            <li class="breadcrumb-item active" aria-current="page" style="color: #64748b; font-weight: 500;">{{ product.name }}</li>
         </ol>
     </nav>
 
@@ -17,17 +17,18 @@
         <!-- Product Images -->
         <div class="col-lg-6 mb-4">
             <div class="product-images">
-                <div class="main-image mb-3 shadow-sm">
+                <div class="product-detail-image-card mb-3">
                     <img src="{{ product.image_url or url_for('static', filename='images/placeholder.jpg') }}" 
-                         class="img-fluid rounded" id="main-product-image" 
+                         id="main-product-image" 
                          alt="{{ product.name }}">
                 </div>
                 {% if product.additional_images %}
-                <div class="thumbnail-images row g-2">
+                <div class="thumbnail-images row g-3 mt-1">
                     {% for image in product.additional_images %}
                     <div class="col-3">
                         <img src="{{ image.url or url_for('static', filename='images/placeholder.jpg') }}" 
-                             class="img-fluid rounded thumbnail shadow-sm" 
+                             class="img-fluid rounded thumbnail shadow-sm border" 
+                             style="cursor: pointer; transition: all 0.2s; height: 80px; object-fit: contain; background: #fff; padding: 5px;"
                              onclick="document.getElementById('main-product-image').src = this.src"
                              alt="{{ product.name }} - Image {{ loop.index }}">
                     </div>
@@ -39,44 +40,51 @@
 
         <!-- Product Info -->
         <div class="col-lg-6">
-            <div class="product-info p-4 bg-light rounded shadow-sm">
-                {% if product.brand %}
-                <span class="badge bg-primary mb-2">{{ product.brand.name }}</span>
-                {% endif %}
-                {% if product.is_verified %}
-                <span class="badge bg-success mb-2 ms-2"><i class="fas fa-check-circle me-1"></i> Verified Authentic</span>
-                {% endif %}
-                <h1 class="mb-3 product-title">{{ product.name }}</h1>
+            <div class="product-detail-info">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    {% if product.brand %}
+                    <span class="badge text-white px-3 py-2" style="background-color: #EC5228 !important; font-family: 'Outfit'; font-weight: 600; font-size: 0.85rem; border-radius: 8px;">{{ product.brand.name }}</span>
+                    {% endif %}
+                    {% if product.is_verified %}
+                    <span class="badge bg-success text-white px-3 py-2" style="font-family: 'Outfit'; font-weight: 600; font-size: 0.85rem; border-radius: 8px;"><i class="fas fa-check-circle me-1"></i> Verified Authentic</span>
+                    {% endif %}
+                </div>
+                <h1 class="mb-3 product-title fw-bold" style="font-family: 'Outfit'; font-size: 2.2rem; color: #0f172a;">{{ product.name }}</h1>
                 
                 <!-- Price -->
-                <div class="mb-4 price-container">
-                    <h2 class="product-price">₱{{ "%.2f"|format(product.price) }}</h2>
-                    <div class="product-ratings d-flex align-items-center mt-2">
-                        <div class="stars me-2">
+                <div class="mb-4 price-container d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div>
+                        <h2 class="product-price fw-extrabold mb-0" style="color: #EC5228; font-family: 'Outfit'; font-size: 2.5rem; letter-spacing: -0.02em;">₱{{ "{:,.2f}".format(product.price) }}</h2>
+                    </div>
+                    <div class="product-ratings d-flex align-items-center">
+                        <div class="stars me-2" style="color: #ffc107;">
                             {% for i in range(5) %}
                             <i class="fas fa-star{% if average_rating and i < average_rating|int %} text-warning{% elif average_rating and i < average_rating %}-half text-warning{% else %} text-muted{% endif %}"></i>
                             {% endfor %}
                         </div>
-                        <span class="text-muted small">({{ num_reviews if num_reviews else 0 }} reviews)</span>
+                        <span class="text-muted small fw-semibold">({{ num_reviews if num_reviews else 0 }} reviews)</span>
                     </div>
                 </div>
 
-                <!-- Release Date & Brand -->
-                <div class="mb-4">
-                    <div class="row">
+                <!-- Release Date & Brand Summary Table -->
+                <div class="mb-4 p-3 rounded-3 bg-light border" style="font-size: 0.95rem;">
+                    <div class="row g-2">
                         {% if product.release_date %}
-                        <div class="col-md-6">
-                            <p class="mb-1"><strong>Release Date:</strong> {{ product.release_date.strftime('%B %d, %Y') }}</p>
+                        <div class="col-6">
+                            <span class="text-muted d-block small uppercase fw-bold" style="letter-spacing: 0.05em;">Release Date</span>
+                            <span class="fw-semibold text-dark">{{ product.release_date.strftime('%B %d, %Y') }}</span>
                         </div>
                         {% endif %}
                         {% if product.brand %}
-                        <div class="col-md-6">
-                            <p class="mb-1"><strong>Brand:</strong> {{ product.brand.name }}</p>
+                        <div class="col-6">
+                            <span class="text-muted d-block small uppercase fw-bold" style="letter-spacing: 0.05em;">Brand</span>
+                            <span class="fw-semibold text-dark">{{ product.brand.name }}</span>
                         </div>
                         {% endif %}
                         {% if product.category %}
-                        <div class="col-md-6">
-                            <p class="mb-1"><strong>Category:</strong> {{ product.category.name }}</p>
+                        <div class="col-6 mt-2">
+                            <span class="text-muted d-block small uppercase fw-bold" style="letter-spacing: 0.05em;">Category</span>
+                            <span class="fw-semibold text-dark">{{ product.category.name }}</span>
                         </div>
                         {% endif %}
                     </div>
@@ -84,27 +92,29 @@
 
                 <!-- Size Selection -->
                 <div class="mb-4 sizes-container">
-                    <h6 class="section-title">Select Size <span class="text-danger">*</span> <small class="text-muted">(Required for wishlist and cart)</small></h6>
-                    <div class="size-grid">
+                    <div class="size-header-container">
+                        <h5 class="fw-bold mb-0" style="font-family: 'Outfit';">Select Size <span class="text-danger">*</span> <small class="text-muted" style="font-size: 0.8rem;">(Required for wishlist and cart)</small></h5>
+                    </div>
+                    <div class="size-pill-grid mt-3">
                         {% if product_sizes %}
                             {% for product_size in product_sizes %}
-                                <input type="radio" class="btn-check" name="size" id="size-{{ product_size.size.value }}" value="{{ product_size.size_id }}"
+                                <input type="radio" class="size-pill-input" name="size" id="size-{{ product_size.size.value }}" value="{{ product_size.size_id }}"
                                        {% if product_size.stock <= 0 %}disabled{% endif %}>
-                                <label class="btn btn-outline-dark me-2 mb-2 {% if product_size.stock <= 0 %}disabled{% endif %}" 
-                                       for="size-{{ product_size.size.value }}">
-                                    {{ product_size.size.value }} ({{ product_size.stock }})
+                                <label class="size-pill-label" for="size-{{ product_size.size.value }}">
+                                    <span class="size-value">{{ product_size.size.value }}</span>
+                                    <span class="stock-label">({{ product_size.stock }})</span>
                                 </label>
                             {% endfor %}
                         {% else %}
-                            <div class="alert alert-warning">
-                                No sizes available for this product at the moment.
+                            <div class="alert alert-warning py-2 px-3 rounded-3" style="font-size: 0.9rem;">
+                                <i class="fas fa-exclamation-triangle me-1"></i> No sizes available for this product at the moment.
                             </div>
                         {% endif %}
                     </div>
                 </div>
 
                 <!-- Stock Availability Display -->
-                <div class="stock-availability mb-3">
+                <div class="stock-availability mb-4">
                     {% set ns = namespace(total_stock=0) %}
                     {% if product_sizes %}
                         {% for product_size in product_sizes %}
@@ -113,22 +123,22 @@
                     {% endif %}
                     
                     {% if ns.total_stock > 10 %}
-                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> In Stock</span>
+                        <span class="badge bg-success px-3 py-2" style="border-radius: 6px; font-weight: 600;"><i class="fas fa-check-circle me-1"></i> In Stock</span>
                     {% elif ns.total_stock > 0 %}
-                        <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i> Low Stock - Only {{ ns.total_stock }} left</span>
+                        <span class="badge bg-warning text-dark px-3 py-2" style="border-radius: 6px; font-weight: 600;"><i class="fas fa-exclamation-triangle me-1"></i> Low Stock - Only {{ ns.total_stock }} left</span>
                     {% else %}
-                        <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> Out of Stock</span>
+                        <span class="badge bg-danger px-3 py-2" style="border-radius: 6px; font-weight: 600;"><i class="fas fa-times-circle me-1"></i> Out of Stock</span>
                     {% endif %}
                 </div>
                 
                 <!-- Quantity Selection -->
                 <div class="mb-4">
-                    <h6 class="section-title">Quantity</h6>
+                    <h6 class="fw-bold mb-2" style="font-family: 'Outfit'; font-size: 1rem;">Quantity</h6>
                     <div class="d-flex align-items-center">
-                        <div class="quantity-selector d-flex align-items-center border rounded">
-                            <button type="button" class="btn btn-sm btn-outline-secondary border-0" id="decrease-qty" onclick="updateQuantity(-1)">-</button>
-                            <input type="number" class="form-control border-0 text-center" id="product-quantity" value="1" min="1" max="10" style="width: 60px;" onchange="validateQuantity(this)">
-                            <button type="button" class="btn btn-sm btn-outline-secondary border-0" id="increase-qty" onclick="updateQuantity(1)">+</button>
+                        <div class="quantity-selector d-flex align-items-center border rounded-3 p-1" style="background: #f8fafc; border-color: #cbd5e1 !important;">
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none fw-bold px-3 py-1" style="color: #0f172a;" id="decrease-qty" onclick="updateQuantity(-1)">-</button>
+                            <input type="number" class="form-control border-0 text-center fw-bold p-0" id="product-quantity" value="1" min="1" max="10" style="width: 50px; background: transparent; color: #0f172a;" onchange="validateQuantity(this)">
+                            <button type="button" class="btn btn-sm btn-link text-decoration-none fw-bold px-3 py-1" style="color: #0f172a;" id="increase-qty" onclick="updateQuantity(1)">+</button>
                         </div>
                     </div>
                 </div>
@@ -142,18 +152,18 @@
                         <input type="hidden" name="product_id" value="{{ product.id }}">
                         <input type="hidden" name="size_id" id="cart_size_id" value="">
                         <input type="hidden" name="quantity" id="cart_quantity" value="1">
-                        <button type="submit" class="btn btn-primary w-100 py-3 shadow-sm" id="add-to-cart-btn" onclick="return validateBeforeSubmit('cart')">
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm" style="background: #EC5228; border: none; font-family: 'Outfit'; font-size: 1.1rem; transition: all 0.3s;" id="add-to-cart-btn" onclick="return validateBeforeSubmit('cart')">
                             <i class="fas fa-shopping-cart me-2"></i>Add to Cart
                         </button>
                     </form>
                     {% else %}
                     <!-- Login link for non-authenticated users -->
-                    <a href="{{ url_for('login') }}?next={{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary flex-grow-1 py-3 shadow-sm">
+                    <a href="{{ url_for('login') }}?next={{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary flex-grow-1 py-3 fw-bold rounded-3 shadow-sm" style="background: #EC5228; border: none; font-family: 'Outfit'; font-size: 1.1rem; text-align: center; display: inline-block;">
                         <i class="fas fa-shopping-cart me-2"></i>Add to Cart
                     </a>
                     {% endif %}
                     {% else %}
-                    <button type="button" class="btn btn-secondary flex-grow-1 py-3 shadow-sm" disabled>
+                    <button type="button" class="btn btn-secondary flex-grow-1 py-3 fw-bold rounded-3 shadow-sm" disabled>
                         <i class="fas fa-times-circle me-2"></i>Out of Stock
                     </button>
                     {% endif %}
@@ -163,12 +173,12 @@
                     <form method="POST" action="{{ url_for('add_to_wishlist', product_id=product.id) }}">
                         <input type="hidden" name="size_id" id="wishlist_size_id" value="">
                         <input type="hidden" name="quantity" id="wishlist_quantity" value="1">
-                        <button type="submit" class="btn btn-outline-danger py-3 px-4 shadow-sm" onclick="return validateBeforeSubmit('wishlist')">
+                        <button type="submit" class="btn btn-outline-danger py-3 px-4 rounded-3 shadow-sm" style="border-color: #cbd5e1; color: #ef4444; transition: all 0.3s;" onclick="return validateBeforeSubmit('wishlist')">
                             <i class="fas fa-heart{% if in_wishlist %} text-danger{% endif %}"></i>
                         </button>
                     </form>
                     {% elif ns.total_stock > 0 %}
-                    <a href="{{ url_for('login') }}?next={{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-danger py-3 px-4 shadow-sm">
+                    <a href="{{ url_for('login') }}?next={{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-danger py-3 px-4 rounded-3 shadow-sm" style="border-color: #cbd5e1; color: #ef4444; text-align: center; display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-heart"></i>
                     </a>
                     {% endif %}
@@ -233,54 +243,49 @@
                     });
                 </script>
 
-                <!-- Product Details -->
+                <!-- Product Details Description -->
                 <div class="product-details mb-4">
-                    <h6 class="section-title">Product Details</h6>
-                    <p class="description">{{ product.description }}</p>
-                    <div class="specifications">
+                    <h6 class="fw-bold mb-2" style="font-family: 'Outfit'; font-size: 1.1rem;">Product Description</h6>
+                    <p class="description text-muted" style="font-size: 0.95rem; line-height: 1.6;">{{ product.description }}</p>
+                    <div class="specifications mt-3">
                         <div class="row">
                             <div class="col-md-6">
-                                <ul class="list-unstyled specs-list">
+                                <ul class="list-unstyled specs-list text-muted" style="font-size: 0.9rem;">
                                     {% if product.style_code %}
-                                    <li><span class="fw-bold">Style:</span> {{ product.style_code }}</li>
+                                    <li class="mb-1"><span class="fw-bold text-dark">Style Code:</span> {{ product.style_code }}</li>
                                     {% endif %}
                                     {% if product.color %}
-                                    <li><span class="fw-bold">Color:</span> {{ product.color }}</li>
+                                    <li class="mb-1"><span class="fw-bold text-dark">Colorway:</span> {{ product.color }}</li>
                                     {% endif %}
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="list-unstyled specs-list">
-                                    <!-- Moved to above the size selection -->
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Delivery Info -->
-                <div class="delivery-info bg-white p-3 rounded shadow-sm">
+                <!-- Delivery Info Card -->
+                <div class="delivery-info bg-light p-3 rounded-3 border mt-4">
                     <div class="d-flex align-items-center mb-3">
-                        <i class="bi bi-truck me-2 text-primary"></i>
-                        <span>Free shipping on orders over ₱5,000</span>
+                        <i class="fas fa-truck me-3 text-primary" style="color: #EC5228 !important; font-size: 1.2rem;"></i>
+                        <span class="small fw-semibold text-dark">Free shipping on orders over ₱5,000</span>
                     </div>
                     <div class="d-flex align-items-center mb-3">
-                        <i class="bi bi-arrow-return-left me-2 text-primary"></i>
-                        <span>Free returns within 30 days</span>
+                        <i class="fas fa-undo me-3 text-primary" style="color: #EC5228 !important; font-size: 1.2rem;"></i>
+                        <span class="small fw-semibold text-dark">Free returns within 30 days</span>
                     </div>
                     <div class="d-flex align-items-center">
-                        <i class="bi bi-shield-check me-2 text-primary"></i>
-                        <span>100% Authentic Guarantee</span>
+                        <i class="fas fa-shield-alt me-3 text-primary" style="color: #EC5228 !important; font-size: 1.2rem;"></i>
+                        <span class="small fw-semibold text-dark">100% Authentic Guarantee</span>
                     </div>
                     
                     {% if product.is_verified %}
-                    <hr>
+                    <hr class="my-3">
                     <div class="verified-badge mt-2">
                         <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-success me-2"><i class="fas fa-check-circle me-1"></i> Verified Authentic</span>
-                            <span class="fw-bold">Kickx Authenticated</span>
+                            <span class="badge bg-success me-2 px-2 py-1" style="font-size: 0.75rem;"><i class="fas fa-check-circle me-1"></i> VERIFIED</span>
+                            <span class="fw-bold small text-dark" style="font-family: 'Outfit';">KickX Authentication Process</span>
                         </div>
-                        <p class="small mb-0 text-muted">This product has been examined by Kickx authentication experts and verified to be 100% authentic. Our team inspects materials, stitching, labels, packaging, and other details to ensure authenticity.</p>
+                        <p class="small mb-0 text-muted" style="font-size: 0.82rem; line-height: 1.4;">Every single sneaker is physically inspected, verified, and checked by KickX authenticity experts. Stitching, materials, boxing, and labels are closely checked against our authentic database.</p>
                     </div>
                     {% endif %}
                 </div>
@@ -462,30 +467,31 @@
 
     <!-- Related Products -->
     <div class="related-products mt-5">
-        <h3 class="section-title mb-4">You May Also Like</h3>
+        <h3 class="section-title mb-4" style="font-family: 'Outfit';">You May Also Like</h3>
         <div class="row g-4">
             {% for related in related_products %}
-            <div class="col-md-3">
-                <div class="card h-100 product-card">
-                    <div class="position-relative">
-                        <img src="{{ related.image_url or url_for('static', filename='images/placeholder.jpg') }}"
-                             class="card-img-top" 
-                             alt="{{ related.name }}">
+            <div class="col-lg-3 col-md-6">
+                <div class="product-card">
+                    <div class="product-image-wrapper" style="height: 180px; padding: 20px;">
+                        {% if related.is_verified %}
+                        <span class="product-badge verified" style="font-size: 0.65rem; padding: 3px 8px;"><i class="fas fa-check-circle"></i> VERIFIED</span>
+                        {% endif %}
+                        <img src="{{ related.image_url or url_for('static', filename='images/placeholder.jpg') }}" alt="{{ related.name }}">
                     </div>
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">{{ related.brand.name }}</h6>
-                        <h5 class="card-title mb-2">{{ related.name }}</h5>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div>
-                                <span class="fw-bold">₱{{ "%.2f"|format(related.price) }}</span>
-                            </div>
-                        </div>
+                    <div class="product-info-wrapper" style="padding: 16px;">
+                        <div class="product-brand" style="font-size: 0.75rem;">{{ related.brand.name }}</div>
+                        <h5 class="product-title" style="font-size: 0.95rem; height: 38px; margin-bottom: 8px;"><a href="{{ url_for('product_detail', slug=related.slug) }}" class="text-decoration-none text-dark">{{ related.name }}</a></h5>
+                        
                         <!-- Recommendation explanation -->
                         {% set reason = recommendations[loop.index0]['reason'] if recommendations and loop.index0 < recommendations|length else 'default' %}
-                        {% include 'products/_recommendation_explanation.html' %}
-                    </div>
-                    <div class="card-footer bg-transparent border-top-0">
-                        <a href="{{ url_for('product_detail', slug=related.slug) }}" class="btn btn-primary w-100">View Details</a>
+                        <div class="mb-3">
+                            {% include 'products/_recommendation_explanation.html' %}
+                        </div>
+
+                        <div class="product-price-row">
+                            <span class="product-price" style="font-size: 1.15rem;">₱{{ "{:,.2f}".format(related.price) }}</span>
+                            <a href="{{ url_for('product_detail', slug=related.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3" style="font-size: 0.75rem;">Details</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -536,326 +542,21 @@
 </div>
 {% endblock %}
 
-{% block styles %}
+{% block extra_css %}
 <style>
 .progress-bar {
-    background-color: #0d6efd !important;
+    background-color: #EC5228 !important;
 }
-
-/* Star Rating Styles */
-.star-rating {
-    margin-bottom: 15px;
-}
-
-.star-rating .form-check-inline {
-    margin-right: 15px;
-}
-
-.star-rating .form-check-input:checked + .form-check-label {
-    font-weight: bold;
-}
-
 .star-rating .fas.fa-star {
     color: #ffc107;
 }
-
 .form-check-input:checked ~ .form-check-label .fas.fa-star {
     color: #ffc107;
-}
-
-/* Recommendation Badges */
-.recommendation-explanation {
-    margin-top: 8px;
-}
-
-.recommendation-explanation .badge {
-    font-weight: 500;
-    padding: 5px 10px;
-    border-radius: 12px;
-}
-
-.recommendation-explanation small {
-    font-size: 0.75rem;
-    color: #6c757d;
-}
-
-/* Product Images */
-.product-image-container {
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.main-image {
-    width: 100%;
-    height: auto;
-    transition: transform 0.3s ease;
-}
-
-.thumbnail-container {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.thumbnail {
-    width: 70px;
-    height: 70px;
-    border-radius: 5px;
-    cursor: pointer;
-    object-fit: cover;
-    border: 2px solid transparent;
-    transition: all 0.2s ease;
-}
-
-.thumbnail:hover, .thumbnail.active {
-    border-color: #0d6efd;
-    transform: scale(1.05);
-}
-
-/* Product Info */
-.product-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
-.brand-badge {
-    font-size: 0.9rem;
-    padding: 5px 12px;
-    border-radius: 20px;
-    background-color: #f8f9fa;
-    color: #212529;
-    display: inline-block;
-    margin-bottom: 15px;
-    border: 1px solid rgba(0,0,0,0.1);
-}
-
-.price-container {
-    margin: 20px 0;
-}
-
-.original-price {
-    text-decoration: line-through;
-    color: #6c757d;
-    font-size: 1.2rem;
-}
-
-.current-price {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #dc3545;
-}
-
-.discount-badge {
-    background-color: #dc3545;
-    color: white;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    margin-left: 10px;
-}
-
-/* Sizes */
-.size-selection {
-    margin: 25px 0;
-}
-
-.size-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.size-guide-link {
-    color: #0d6efd;
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-
-.size-guide-link:hover {
-    text-decoration: underline;
-}
-
-.size-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.size-radio {
-    display: none;
-}
-
-.size-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50px;
-    height: 50px;
-    border-radius: 5px;
-    border: 1px solid #dee2e6;
-    background-color: #f8f9fa;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.size-radio:checked + .size-label {
-    background-color: #0d6efd;
-    color: white;
-    border-color: #0d6efd;
-}
-
-.size-label:hover {
-    border-color: #0d6efd;
-    background-color: #e9ecef;
-}
-
-.size-radio:checked + .size-label:hover {
-    background-color: #0b5ed7;
-}
-
-/* Buttons */
-.action-buttons {
-    display: flex;
-    gap: 15px;
-    margin: 25px 0;
-}
-
-.btn-add-cart {
-    flex: 3;
-    padding: 12px;
-    background-color: #0d6efd;
-    border: none;
-    color: white;
-    border-radius: 5px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-add-cart:hover {
-    background-color: #0b5ed7;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.btn-wishlist {
-    flex: 1;
-    padding: 12px;
-    background-color: white;
-    border: 1px solid #dee2e6;
-    color: #212529;
-    border-radius: 5px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-wishlist:hover {
-    background-color: #f8f9fa;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* Tabs */
-.product-tabs {
-    margin-top: 40px;
-}
-
-.tab-content {
-    padding: 20px;
-    border: 1px solid #dee2e6;
-    border-top: none;
-    border-radius: 0 0 5px 5px;
-}
-
-.nav-tabs .nav-link {
-    font-weight: 500;
-}
-
-.nav-tabs .nav-link.active {
-    font-weight: 600;
-}
-
-/* Product features */
-.features-list {
-    padding-left: 20px;
-}
-
-.features-list li {
-    margin-bottom: 10px;
-}
-
-/* Reviews */
-.review-item {
-    border-bottom: 1px solid #dee2e6;
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-}
-
-.review-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-.review-date {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.stars-container {
-    color: #ffc107;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 767.98px) {
-    .product-title {
-        font-size: 1.8rem;
-    }
-    
-    .current-price {
-        font-size: 1.6rem;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-    }
-    
-    .btn-add-cart,
-    .btn-wishlist {
-        width: 100%;
-    }
-}
-
-/* Size Guide Modal */
-.size-guide-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.size-guide-table th, .size-guide-table td {
-    border: 1px solid #dee2e6;
-    padding: 8px 12px;
-    text-align: center;
-}
-
-.size-guide-table th {
-    background-color: #f8f9fa;
-}
-
-.size-note {
-    margin-top: 15px;
-    font-size: 0.9rem;
-    color: #6c757d;
-    font-style: italic;
 }
 </style>
 {% endblock %}
 
-{% block scripts %}
+{% block extra_js %}
 <script>
     // Size Guide functionality
     document.addEventListener('DOMContentLoaded', function() {
@@ -881,13 +582,19 @@
         // Check if URL contains #review-form
         if (window.location.hash === '#review-form') {
             // Show the reviews tab
-            var reviewsTab = new bootstrap.Tab(document.getElementById('reviews-tab'));
-            reviewsTab.show();
-            
-            // Scroll to review form
-            setTimeout(function() {
-                document.getElementById('review-form').scrollIntoView();
-            }, 300);
+            var reviewsTabNode = document.getElementById('reviews-tab');
+            if (reviewsTabNode) {
+                var reviewsTab = new bootstrap.Tab(reviewsTabNode);
+                reviewsTab.show();
+                
+                // Scroll to review form
+                setTimeout(function() {
+                    var reviewFormNode = document.getElementById('review-form');
+                    if (reviewFormNode) {
+                        reviewFormNode.scrollIntoView();
+                    }
+                }, 300);
+            }
         }
     });
 </script>

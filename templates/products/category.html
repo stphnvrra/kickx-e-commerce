@@ -1,21 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}{{ category.name }} - Kickx{% endblock %}
+{% block title %}{{ category.name }} - KickX{% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-5">
-    <nav aria-label="breadcrumb">
+<div class="pt-2">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('products.catalog') }}">Shop</a></li>
-            <li class="breadcrumb-item active">{{ category.name }}</li>
+            <li class="breadcrumb-item"><a href="{{ url_for('product_catalog') }}" class="text-decoration-none" style="color: #EC5228;">Shop</a></li>
+            <li class="breadcrumb-item active" aria-current="page" style="color: #64748b; font-weight: 500;">{{ category.name }}</li>
         </ol>
     </nav>
 
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-4">{{ category.name }}</h1>
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col text-center text-md-start">
+            <h1 class="display-4 fw-bold mb-2" style="font-family: 'Outfit'; color: #0f172a;">{{ category.name }}</h1>
             {% if category.description %}
-            <p class="lead">{{ category.description }}</p>
+            <p class="lead text-muted" style="font-size: 1.1rem;">{{ category.description }}</p>
             {% endif %}
         </div>
     </div>
@@ -24,28 +26,34 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
         {% for product in products %}
         <div class="col">
-            <div class="card h-100 product-card">
-                <div class="product-image-container">
-                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+            <div class="product-card">
+                <div class="product-image-wrapper">
                     {% if product.discount_price %}
-                    <div class="discount-badge">
-                        {{ "%.0f"|format((1 - product.discount_price / product.price) * 100) }}% OFF
-                    </div>
+                    <span class="card-badge-discount">-{{ ((product.price - product.discount_price) / product.price * 100) | round | int }}%</span>
                     {% endif %}
+                    {% if product.is_verified %}
+                    <span class="card-badge-verified"><i class="fas fa-check-circle"></i> VERIFIED</span>
+                    {% endif %}
+                    <button class="wishlist-btn-pill {% if product.in_wishlist %}active{% endif %} wishlist-btn" 
+                            data-product-id="{{ product.id }}"
+                            title="Add to Wishlist">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <img src="{{ product.image_url or url_for('static', filename='images/placeholder.jpg') }}" alt="{{ product.name }}">
                 </div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ product.name }}</h5>
-                    <p class="card-text text-muted">{{ product.brand.name }}</p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="price-container">
+                <div class="product-info-wrapper">
+                    <div class="product-brand">{{ product.brand.name }}</div>
+                    <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}" class="text-decoration-none text-dark">{{ product.name }}</a></h5>
+                    <div class="product-price-row mt-2">
+                        <div>
                             {% if product.discount_price %}
-                            <span class="original-price">${{ "%.2f"|format(product.price) }}</span>
-                            <span class="discount-price">${{ "%.2f"|format(product.discount_price) }}</span>
+                            <span class="product-price" style="font-size: 1.2rem;">₱{{ "{:,.2f}".format(product.discount_price) }}</span>
+                            <span class="text-muted text-decoration-line-through ms-2 small" style="font-size: 0.8rem;">₱{{ "{:,.2f}".format(product.price) }}</span>
                             {% else %}
-                            <span class="price">${{ "%.2f"|format(product.price) }}</span>
+                            <span class="product-price" style="font-size: 1.2rem;">₱{{ "{:,.2f}".format(product.price) }}</span>
                             {% endif %}
                         </div>
-                        <a href="{{ url_for('products.detail', slug=product.slug) }}" class="btn btn-sm btn-outline-dark">View</a>
+                        <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Details</a>
                     </div>
                 </div>
             </div>
@@ -55,66 +63,45 @@
     {% else %}
     <div class="row">
         <div class="col text-center py-5">
-            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-            <h3>No products found</h3>
-            <p>There are no products available in this category at the moment.</p>
-            <a href="{{ url_for('products.catalog') }}" class="btn btn-primary mt-3">Browse All Products</a>
+            <i class="fas fa-box display-1 text-muted mb-4" style="color: #cbd5e1 !important;"></i>
+            <h3 class="fw-bold" style="font-family: 'Outfit';">No products found</h3>
+            <p class="text-muted">There are no products available in this category at the moment.</p>
+            <a href="{{ url_for('product_catalog') }}" class="btn btn-primary mt-3 px-4 py-2.5 rounded-3 fw-bold" style="background: #EC5228; border: none; font-family: 'Outfit';">Browse All Products</a>
         </div>
     </div>
     {% endif %}
 </div>
 {% endblock %}
 
-{% block styles %}
-<style>
-.product-card {
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+{% block extra_css %}
+<!-- Styles are loaded globally from style.css -->
+{% endblock %}
 
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.product-image-container {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-}
-
-.product-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.discount-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #dc3545;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 3px;
-    font-weight: bold;
-}
-
-.original-price {
-    text-decoration: line-through;
-    color: #6c757d;
-    font-size: 0.9rem;
-    margin-right: 5px;
-}
-
-.discount-price {
-    color: #dc3545;
-    font-weight: bold;
-}
-
-.price {
-    font-weight: bold;
-}
-</style>
-{% endblock %} 
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle wishlist buttons
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            
+            fetch(`/api/wishlist/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.in_wishlist) {
+                    this.classList.add('active');
+                } else {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Databases
+instance/kickx.db
+*.db
+*.sqlite
+
+# IDEs & System
+.DS_Store
+.vscode/
+.idea/
+.gemini/
+.tempmediaStorage/

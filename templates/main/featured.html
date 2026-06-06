@@ -3,51 +3,46 @@
 {% block title %}Featured Products - Kickx{% endblock %}
 
 {% block content %}
-<div class="container mt-5 pt-5">
-    <div class="row mb-4">
-        <div class="col">
-            <h1 class="display-4">Featured Products</h1>
-            <p class="lead">Discover our handpicked selection of exceptional features</p>
+<div class="pt-2">
+    <div class="row mb-5">
+        <div class="col text-center text-md-start">
+            <h1 class="display-4 fw-bold mb-2" style="font-family: 'Outfit'; color: #0f172a;">Featured Heat</h1>
+            <p class="lead text-muted" style="font-size: 1.1rem;">Discover our handpicked selection of premium features from the global marketplace</p>
         </div>
     </div>
     
     <div class="row">
         {% for product in products %}
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-            <div class="card h-100 product-card">
-                <div class="position-relative">
-                    <img src="{{ product.image_url or url_for('static', filename='images/placeholder.jpg') }}" 
-                         class="card-img-top" 
-                         alt="{{ product.name }}">
+            <div class="product-card">
+                <div class="product-image-wrapper">
                     {% if product.discount_price %}
-                    <span class="badge bg-danger position-absolute top-0 end-0 m-3">Sale</span>
+                    <span class="card-badge-discount">Sale</span>
                     {% endif %}
                     {% if product.is_verified %}
-                    <span class="badge bg-success position-absolute bottom-0 end-0 m-3 verification-badge">
-                        <i class="bi bi-check-circle-fill me-1"></i> Verified
-                    </span>
+                    <span class="card-badge-verified"><i class="fas fa-check-circle"></i> VERIFIED</span>
                     {% endif %}
+                    <button class="wishlist-btn-pill {% if product.in_wishlist %}active{% endif %} wishlist-btn" 
+                            data-product-id="{{ product.id }}"
+                            title="Add to Wishlist">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <img src="{{ product.image_url or url_for('static', filename='images/placeholder.jpg') }}" alt="{{ product.name }}">
                 </div>
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">{{ product.brand.name }}</h6>
-                    <h5 class="card-title mb-2">{{ product.name }}</h5>
-                    <div class="d-flex justify-content-between align-items-center">
+                <div class="product-info-wrapper">
+                    <div class="product-brand">{{ product.brand.name }}</div>
+                    <h5 class="product-title"><a href="{{ url_for('product_detail', slug=product.slug) }}" class="text-decoration-none text-dark">{{ product.name }}</a></h5>
+                    <div class="product-price-row mt-2">
                         <div>
                             {% if product.discount_price %}
-                            <span class="text-muted text-decoration-line-through">₱{{ "%.2f"|format(product.price) }}</span>
-                            <span class="text-danger fw-bold">₱{{ "%.2f"|format(product.discount_price) }}</span>
+                            <span class="product-price" style="font-size: 1.25rem;">₱{{ "{:,.2f}".format(product.discount_price) }}</span>
+                            <span class="text-muted text-decoration-line-through ms-2 small">₱{{ "{:,.2f}".format(product.price) }}</span>
                             {% else %}
-                            <span class="fw-bold">₱{{ "%.2f"|format(product.price) }}</span>
+                            <span class="product-price" style="font-size: 1.25rem;">₱{{ "{:,.2f}".format(product.price) }}</span>
                             {% endif %}
                         </div>
-                        <div class="product-ratings">
-                            <!-- Display average rating -->
-                            <small class="text-muted">{{ product.average_rating|default(0, true)|round(1) }} <i class="bi bi-star-fill text-warning"></i></small>
-                        </div>
+                        <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Details</a>
                     </div>
-                </div>
-                <div class="card-footer bg-transparent border-top-0">
-                    <a href="{{ url_for('product_detail', slug=product.slug) }}" class="btn btn-primary w-100">View Details</a>
                 </div>
             </div>
         </div>
@@ -55,47 +50,42 @@
     </div>
     
     {% if not products %}
-    <div class="alert alert-info my-5">
-        <p class="mb-0">No featured products available at the moment. Check back soon!</p>
+    <div class="alert alert-info my-5 rounded-3 py-3 px-4">
+        <i class="fas fa-info-circle me-2"></i> No featured products available at the moment. Check back soon!
     </div>
     {% endif %}
 </div>
 {% endblock %}
 
-{% block styles %}
-<style>
-.product-card {
-    transition: transform 0.3s, box-shadow 0.3s;
-    border: none;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
+{% block extra_css %}
+<!-- Styles are loaded globally from style.css -->
+{% endblock %}
 
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.product-image-container {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
-}
-
-.product-image-container img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.price {
-    font-weight: bold;
-}
-
-.verification-badge {
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-</style>
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle wishlist buttons
+    document.querySelectorAll('.wishlist-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const productId = this.dataset.productId;
+            
+            fetch(`/api/wishlist/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.in_wishlist) {
+                    this.classList.add('active');
+                } else {
+                    this.classList.remove('active');
+                }
+            });
+        });
+    });
+});
+</script>
 {% endblock %} 

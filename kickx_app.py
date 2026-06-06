@@ -22,9 +22,13 @@ paypal_service = PayPalService()
 app = Flask(__name__)
 bootstrap=Bootstrap5(app)
 
-app.config['SECRET_KEY'] = '^wXer#e*we*$&wxQ^@*&@3'
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///kickx.db"
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '^wXer#e*we*$&wxQ^@*&@3')
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, 'instance', 'kickx.db')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+DEMO_MODE = os.environ.get('DEMO_MODE', 'true').lower() == 'true'
+app.config['DEMO_MODE'] = DEMO_MODE
 
 # Login manager setup
 login_manager = LoginManager()
@@ -32,7 +36,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 # File upload settings
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
+app.config['UPLOAD_FOLDER'] = os.path.join(basedir, 'static', 'uploads')
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB max upload
 
@@ -639,6 +643,19 @@ def brand_products(slug):
 def category_products(slug):
     category = Category.query.filter_by(slug=slug).first_or_404()
     products = Product.query.filter_by(category_id=category.id).all()
+    
+    # Check wishlist status for products
+    for product in products:
+        product.in_wishlist = False
+        if current_user.is_authenticated:
+            wishlist = Wishlist.query.filter_by(user_id=current_user.id).first()
+            if wishlist:
+                in_wishlist = WishlistItem.query.filter_by(
+                    wishlist_id=wishlist.id,
+                    product_id=product.id
+                ).first() is not None
+                product.in_wishlist = in_wishlist
+                
     return render_template('products/category.html', category=category, products=products)
 
 # Authentication Routes
@@ -2034,8 +2051,9 @@ def admin_notification_settings():
     # Create default settings if none exist
     if not settings:
         settings = NotificationSettings()
-        db.session.add(settings)
-        db.session.commit()
+        if not app.config.get('DEMO_MODE', False):
+            db.session.add(settings)
+            db.session.commit()
     
     return render_template('admin/notification_settings.html', settings=settings)
 
@@ -2311,6 +2329,35 @@ def admin_create_notification():
     return render_template('admin/create_notification.html', products=products)
 
 
+
+# Demo guard to block write operations when running in DEMO_MODE
+@app.before_request
+def demo_guard():
+    if DEMO_MODE:
+        is_write = False
+        if request.method in ['POST', 'DELETE', 'PUT', 'PATCH']:
+            # Whitelist login route so demo login still works
+            if request.endpoint != 'login':
+                is_write = True
+        elif request.method == 'GET':
+            # Check specific GET routes that perform database writes
+            write_endpoints = {
+                'remove_from_cart',
+                'profile_delete_address',
+                'delete_review',
+                'admin_delete_product',
+                'complete_paypal_order'
+            }
+            if request.endpoint in write_endpoints:
+                is_write = True
+
+        if is_write:
+            # Handle API/JSON requests
+            if request.is_json or (request.path and request.path.startswith('/api/')):
+                return jsonify({'success': False, 'message': 'This feature is disabled in Demo Mode.'}), 403
+            
+            flash("You are in demo mode. Database modifications are disabled.", "warning")
+            return redirect(request.referrer or url_for('index'))
 
 # Add before_request handler to make notifications available in templates
 @app.before_request
