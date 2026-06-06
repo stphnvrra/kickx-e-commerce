@@ -15,7 +15,7 @@ KickX E-Commerce is a comprehensive, modern sneakers web application built with 
 ## Tech Stack
 
 - **Backend framework**: Flask (Python)
-- **Database**: SQLite with SQLAlchemy ORM (Flask-SQLAlchemy)
+- **Database**: Supabase (PostgreSQL)
 - **Payment Gateway**: PayPal SDK (`paypal-checkout-server-sdk`)
 - **Data Analysis / Engine**: Pandas, NumPy
 - **Frontend**: HTML5, CSS3, JavaScript (Jinja2 Templates & Bootstrap 5)
