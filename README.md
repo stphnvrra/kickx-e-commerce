@@ -72,8 +72,8 @@ The application features user authentication, dynamic catalog sorting/filtering,
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/stphnvrra/kickz-e-commerce.git
-   cd kickz-e-commerce
+   git clone https://github.com/stphnvrra/kickx-e-commerce.git
+   cd kickx-e-commerce
    ```
 
 2. **Set Up Virtual Environment**
@@ -108,22 +108,6 @@ The application features user authentication, dynamic catalog sorting/filtering,
    python3 kickx_app.py
    ```
    Open your browser and navigate to `http://127.0.0.1:5001`.
-
----
-
-## ⚡ Deployment to Vercel
-
-The application is pre-configured to build and run as a serverless Flask app on Vercel.
-
-1. **Prerequisites**: Install the Vercel CLI:
-   ```bash
-   npm install -g vercel
-   ```
-2. **Deploy**:
-   ```bash
-   vercel --prod
-   ```
-   Vercel will build the workspace using Python runtime, route requests through `api/index.py`, and host static assets under the `/static` prefix.
 
 ---
 
